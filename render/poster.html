@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>Saturday 21 November 2026</title>
+<style>
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      width: 1024px;
+      height: 1024px;
+      background: #f4efe4;
+      color: #16130f;
+    }
+    .page {
+      width: 1024px;
+      height: 1024px;
+      padding: 10px 14px 8px;
+      display: grid;
+      grid-template-rows: 22px 88px 22px 300px 252px 176px 94px 24px;
+      row-gap: 4px;
+      background: #f4efe4;
+      font-family: Inter, "Source Sans 3", "Source Sans Pro", Roboto, sans-serif;
+    }
+    .mast {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      border-top: 4px solid #16130f;
+      border-bottom: 1px solid #16130f;
+      padding-bottom: 1px;
+    }
+    .kicker-main, .count {
+      font-size: 12px;
+      font-weight: 750;
+      letter-spacing: 0.14em;
+      line-height: 14px;
+    }
+    .count { letter-spacing: 0.08em; font-weight: 700; }
+    h1.date {
+      margin: 0;
+      align-self: center;
+      text-align: center;
+      font-family: "Playfair Display", "Source Serif Pro", Georgia, serif;
+      font-weight: 700;
+      font-size: 76px;
+      line-height: 84px;
+      letter-spacing: -0.012em;
+      white-space: nowrap;
+    }
+    .deck {
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-bottom: 2px solid #16130f;
+      font-family: "Source Serif Pro", "Playfair Display", Georgia, serif;
+      font-style: italic;
+      font-size: 15px;
+      line-height: 18px;
+      text-align: center;
+    }
+    .leads, .features, .split {
+      min-height: 0;
+      display: grid;
+      gap: 8px;
+    }
+    .leads { grid-template-columns: repeat(3, 1fr); }
+    .features {
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-rows: 1fr 1fr;
+      gap: 6px;
+    }
+    .split { grid-template-columns: 1.28fr 0.82fr; }
+    .lead, .card, .panel, .datecheck {
+      border: 1.5px solid #16130f;
+      background: #fbf7f0;
+      min-height: 0;
+    }
+    .lead { display: flex; flex-direction: column; }
+    .art { position: relative; height: 114px; flex: none; background: #e7dcc8; }
+    .art svg { width: 100%; height: 100%; display: block; }
+    .art-label {
+      position: absolute;
+      left: 0; right: 0; bottom: 0;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      padding: 0 8px;
+      background: #16130f;
+      color: #f4efe4;
+      font-size: 11px;
+      font-weight: 750;
+      letter-spacing: 0.14em;
+    }
+    .lead-body, .card {
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+    .lead-body { flex: 1; padding: 7px 9px 6px; }
+    .card { padding: 6px 8px 5px; }
+    .tag {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 750;
+      letter-spacing: 0.06em;
+      line-height: 14px;
+    }
+    .card .tag { font-size: 10px; letter-spacing: 0.05em; }
+    .num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 16px;
+      height: 16px;
+      padding: 0 3px;
+      background: #16130f;
+      color: #f4efe4;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+    .lead h2, .card h3, .brief h3 {
+      margin: 3px 0 0;
+      font-family: "Playfair Display", "Source Serif Pro", Georgia, serif;
+      font-weight: 700;
+      color: #16130f;
+    }
+    .lead h2 { font-size: 21px; line-height: 1.12; }
+    .card h3 { font-size: 14.5px; line-height: 1.15; }
+    .lead p, .card p {
+      margin: 4px 0 0;
+      font-size: 13px;
+      line-height: 1.28;
+    }
+    .card p { font-size: 12px; line-height: 1.25; margin-top: 3px; }
+    cite {
+      margin-top: auto;
+      padding-top: 3px;
+      font-style: normal;
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      line-height: 13px;
+    }
+    .card .icon { width: 22px; height: 22px; flex: none; }
+    .card .tag { min-height: 22px; }
+    .panel { padding: 6px 8px 5px; display: flex; flex-direction: column; }
+    .panel h2, .brief-head {
+      margin: 0;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      line-height: 14px;
+    }
+    .map-canvas { flex: 1; min-height: 0; margin: 3px 0; }
+    .map-canvas svg { width: 100%; height: 100%; display: block; }
+    .map-note, .datecheck p, footer {
+      margin: 0;
+      font-size: 11.5px;
+      line-height: 1.3;
+    }
+    .brief-head { letter-spacing: 0.08em; }
+    .brief { padding-top: 4px; display: flex; flex-direction: column; flex: 1; }
+    .brief .tag { margin-top: 6px; }
+    .brief h3 { font-size: 18px; line-height: 1.18; }
+    .brief p { margin: 4px 0 0; font-size: 14px; line-height: 1.3; }
+    .datecheck {
+      padding: 6px 8px 5px;
+      border-width: 2px;
+      border-color: #9e1b28;
+      background: #f4efe4;
+    }
+    .datecheck strong {
+      display: block;
+      color: #9e1b28;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      line-height: 14px;
+      margin-bottom: 2px;
+    }
+    .datecheck p { font-size: 12px; line-height: 1.28; }
+    footer {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 650;
+      letter-spacing: 0.01em;
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="mast">
+      <div class="kicker-main">THE WORLD IN ONE DAY</div>
+      <div class="count">12 STORIES · SATURDAY 21 NOVEMBER 2026</div>
+    </header>
+    <h1 class="date">Saturday 21 November 2026</h1>
+    <p class="deck">Trump vows a tax on overseas data centres · Korea’s exams begin · A Palisades Fire verdict</p>
+    <section class="leads"><article class="lead">
+    <div class="art"><svg viewBox="0 0 320 112" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <rect width="320" height="112" fill="#eadfcb"/>
+      <rect x="18" y="16" width="40" height="70" fill="#16130f"/><rect x="22" y="23.0" width="32" height="3.5" fill="#f4efe4"/><rect x="22" y="33.8" width="32" height="3.5" fill="#f4efe4"/><rect x="22" y="44.6" width="32" height="3.5" fill="#f4efe4"/><rect x="22" y="55.4" width="32" height="3.5" fill="#f4efe4"/><rect x="22" y="66.2" width="32" height="3.5" fill="#f4efe4"/><rect x="49" y="22" width="3.5" height="3.5" fill="#9e1b28"/>
+      <rect x="66" y="26" width="40" height="60" fill="#16130f"/><rect x="70" y="33.0" width="32" height="3.5" fill="#f4efe4"/><rect x="70" y="41.8" width="32" height="3.5" fill="#f4efe4"/><rect x="70" y="50.6" width="32" height="3.5" fill="#f4efe4"/><rect x="70" y="59.4" width="32" height="3.5" fill="#f4efe4"/><rect x="70" y="68.2" width="32" height="3.5" fill="#f4efe4"/><rect x="97" y="32" width="3.5" height="3.5" fill="#9e1b28"/>
+      <rect x="114" y="16" width="40" height="70" fill="#16130f"/><rect x="118" y="23.0" width="32" height="3.5" fill="#f4efe4"/><rect x="118" y="33.8" width="32" height="3.5" fill="#f4efe4"/><rect x="118" y="44.6" width="32" height="3.5" fill="#f4efe4"/><rect x="118" y="55.4" width="32" height="3.5" fill="#f4efe4"/><rect x="118" y="66.2" width="32" height="3.5" fill="#f4efe4"/><rect x="145" y="22" width="3.5" height="3.5" fill="#9e1b28"/>
+      <rect x="168" y="12" width="16" height="76" fill="#9e1b28"/>
+      <polygon points="160,12 192,12 176,2" fill="#9e1b28"/>
+      <polygon points="206,52 186,44 186,60" fill="#16130f"/>
+      <rect x="214" y="34" width="36" height="52" fill="#3d342c"/><rect x="218" y="41.0" width="28" height="3.5" fill="#f4efe4"/><rect x="218" y="48.2" width="28" height="3.5" fill="#f4efe4"/><rect x="218" y="55.4" width="28" height="3.5" fill="#f4efe4"/><rect x="218" y="62.6" width="28" height="3.5" fill="#f4efe4"/><rect x="218" y="69.8" width="28" height="3.5" fill="#f4efe4"/><rect x="241" y="40" width="3.5" height="3.5" fill="#9e1b28"/>
+      <rect x="258" y="24" width="36" height="62" fill="#3d342c"/><rect x="262" y="31.0" width="28" height="3.5" fill="#f4efe4"/><rect x="262" y="40.2" width="28" height="3.5" fill="#f4efe4"/><rect x="262" y="49.4" width="28" height="3.5" fill="#f4efe4"/><rect x="262" y="58.6" width="28" height="3.5" fill="#f4efe4"/><rect x="262" y="67.8" width="28" height="3.5" fill="#f4efe4"/><rect x="285" y="30" width="3.5" height="3.5" fill="#9e1b28"/>
+    </svg><div class="art-label">OVERSEAS LEVY</div></div>
+    <div class="lead-body">
+      <div class="tag"><span class="num">1</span> WASHINGTON · POLICY</div>
+      <h2>Trump vows a “tremendous tax” on data centres built abroad</h2>
+      <p>He says the United States must win the AI contest with China. The remarks come as AI and semiconductor shares fall after Anthropic’s market debut.</p>
+      <cite>ABC, SBS · Saturday</cite>
+    </div>
+  </article><article class="lead">
+    <div class="art"><svg viewBox="0 0 320 112" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <rect width="320" height="112" fill="#e3eef3"/>
+      <rect x="16" y="16" width="64" height="32" fill="#f7fbfc" stroke="#16130f" stroke-width="1.6"/><rect x="24" y="22" width="26" height="18" fill="#f4efe4" stroke="#16130f" stroke-width="1"/><path d="M28 28 H46 M28 33 H42" stroke="#b7ad9e" stroke-width="1.2"/><rect x="90" y="16" width="64" height="32" fill="#f7fbfc" stroke="#16130f" stroke-width="1.6"/><rect x="98" y="22" width="26" height="18" fill="#f4efe4" stroke="#16130f" stroke-width="1"/><path d="M102 28 H120 M102 33 H116" stroke="#b7ad9e" stroke-width="1.2"/><rect x="164" y="16" width="64" height="32" fill="#f7fbfc" stroke="#16130f" stroke-width="1.6"/><rect x="172" y="22" width="26" height="18" fill="#f4efe4" stroke="#16130f" stroke-width="1"/><path d="M176 28 H194 M176 33 H190" stroke="#b7ad9e" stroke-width="1.2"/><rect x="16" y="54" width="64" height="32" fill="#f7fbfc" stroke="#16130f" stroke-width="1.6"/><rect x="24" y="60" width="26" height="18" fill="#f4efe4" stroke="#16130f" stroke-width="1"/><path d="M28 66 H46 M28 71 H42" stroke="#b7ad9e" stroke-width="1.2"/><rect x="90" y="54" width="64" height="32" fill="#f7fbfc" stroke="#16130f" stroke-width="1.6"/><rect x="112" y="60" width="16" height="20" rx="2" fill="#16130f"/><path d="M108 58 L134 82" stroke="#9e1b28" stroke-width="2.4"/><rect x="164" y="54" width="64" height="32" fill="#f7fbfc" stroke="#16130f" stroke-width="1.6"/><rect x="172" y="60" width="26" height="18" fill="#f4efe4" stroke="#16130f" stroke-width="1"/><path d="M176 66 H194 M176 71 H190" stroke="#b7ad9e" stroke-width="1.2"/>
+      <circle cx="268" cy="34" r="20" fill="#f4efe4" stroke="#16130f" stroke-width="2"/>
+      <path d="M268 34 V20 M268 34 L280 40" fill="none" stroke="#16130f" stroke-width="2"/>
+      <path d="M268 34 L280 40" stroke="#9e1b28" stroke-width="2"/>
+      <rect x="246" y="64" width="52" height="22" fill="#9e1b28"/>
+      <text x="272" y="80" text-anchor="middle" font-family="Inter, sans-serif" font-size="14" font-weight="700" fill="#f4efe4">111</text>
+    </svg><div class="art-label">EXAM DAY</div></div>
+    <div class="lead-body">
+      <div class="tag"><span class="num">2</span> SEOUL · EDUCATION</div>
+      <h2>South Korea’s essay and interview exams begin</h2>
+      <p>Authorities say 111 students were caught in smart-device cheating on this year’s CSAT. The education ministry urged tighter supervision.</p>
+      <cite>SBS · 21 Nov</cite>
+    </div>
+  </article><article class="lead">
+    <div class="art"><svg viewBox="0 0 320 112" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <rect width="320" height="112" fill="#f6ecdf"/>
+      <polygon points="0,92 78,36 156,92" fill="#d4b48a"/>
+      <polygon points="86,92 156,50 236,92" fill="#b8895c"/>
+      <polygon points="70,58 80,38 90,58" fill="#c44820"/>
+      <polygon points="74,58 80,46 86,58" fill="#e6b15a"/>
+      <polygon points="196,44 304,44 290,30 210,30" fill="#16130f"/>
+      <rect x="214" y="44" width="12" height="48" fill="#16130f"/>
+      <rect x="238" y="44" width="12" height="48" fill="#16130f"/>
+      <rect x="262" y="44" width="12" height="48" fill="#16130f"/>
+      <rect x="286" y="44" width="12" height="48" fill="#16130f"/>
+      <rect x="118" y="46" width="4" height="42" fill="#16130f"/>
+      <rect x="98" y="48" width="44" height="3.5" fill="#16130f"/>
+      <path d="M106 52 V66 M134 52 V66" stroke="#16130f" stroke-width="1.6"/>
+      <ellipse cx="106" cy="70" rx="11" ry="4.5" fill="#f4efe4" stroke="#16130f" stroke-width="1.4"/>
+      <ellipse cx="134" cy="70" rx="11" ry="4.5" fill="#9e1b28" stroke="#16130f" stroke-width="1.4"/>
+    </svg><div class="art-label">SECOND TRIAL</div></div>
+    <div class="lead-body">
+      <div class="tag"><span class="num">3</span> LOS ANGELES · COURTS</div>
+      <h2>Rinderknecht found guilty in the Palisades Fire</h2>
+      <p>Jonathan Rinderknecht is found guilty at his second trial of sparking the 2025 fire, which killed 12 people.</p>
+      <cite>ABC · Saturday</cite>
+    </div>
+  </article></section>
+    <section class="features"><article class="card">
+    <div class="tag"><span class="icon"><svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <rect x="2" y="6" width="13" height="12" fill="#f4efe4" stroke="#16130f" stroke-width="1.7"/>
+      <rect x="17" y="14" width="13" height="12" fill="#f4efe4" stroke="#16130f" stroke-width="1.7"/>
+      <path d="M14 12 H18" stroke="#9e1b28" stroke-width="1.8"/>
+      <path d="M16 9.5 L19.5 12 L16 14.5" fill="none" stroke="#9e1b28" stroke-width="1.8"/>
+    </svg></span><span class="num">4</span> AUSTRALIA · DIPLOMACY</div>
+    <h3>Australia strikes an AI deal</h3>
+    <p>The deal with China is on talks about artificial intelligence.</p>
+    <cite>ABC</cite>
+  </article><article class="card">
+    <div class="tag"><span class="icon"><svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <circle cx="7" cy="9" r="3" fill="#16130f"/>
+      <rect x="4" y="13" width="6" height="11" fill="#16130f"/>
+      <circle cx="16" cy="7" r="3.4" fill="#9e1b28"/>
+      <rect x="12.4" y="11.2" width="7.2" height="13" fill="#9e1b28"/>
+      <circle cx="25" cy="10" r="3" fill="#16130f"/>
+      <rect x="22" y="14" width="6" height="10" fill="#16130f"/>
+      <path d="M3 28 H29" stroke="#16130f" stroke-width="1.7"/>
+    </svg></span><span class="num">5</span> EUROPE · PROTEST</div>
+    <h3>Students rally across Europe</h3>
+    <p>They march over the cost of living, war, and education cuts.</p>
+    <cite>ABC</cite>
+  </article><article class="card">
+    <div class="tag"><span class="icon"><svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <rect x="2" y="6" width="13" height="12" fill="#f4efe4" stroke="#16130f" stroke-width="1.7"/>
+      <rect x="17" y="14" width="13" height="12" fill="#f4efe4" stroke="#16130f" stroke-width="1.7"/>
+      <path d="M14 12 H18" stroke="#9e1b28" stroke-width="1.8"/>
+      <path d="M16 9.5 L19.5 12 L16 14.5" fill="none" stroke="#9e1b28" stroke-width="1.8"/>
+    </svg></span><span class="num">6</span> WASHINGTON · DIPLOMACY</div>
+    <h3>Korea raised with Xi and Putin</h3>
+    <p>Trump says the peninsula was discussed, and he gives no details.</p>
+    <cite>SBS · 21 Nov</cite>
+  </article><article class="card">
+    <div class="tag"><span class="icon"><svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <rect x="3" y="6" width="26" height="20" fill="#e5f0e2" stroke="#16130f" stroke-width="1.7"/>
+      <path d="M16 6 V26 M3 16 H29" stroke="#16130f" stroke-width="1.4"/>
+      <circle cx="22" cy="11" r="3.2" fill="#c44820"/>
+    </svg></span><span class="num">7</span> TURIN · SPORT</div>
+    <h3>Alcaraz beats Flavio Cobolli</h3>
+    <p>He wears an elastic band on an injured thigh at the ATP Finals.</p>
+    <cite>ABC</cite>
+  </article><article class="card">
+    <div class="tag"><span class="icon"><svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <rect x="3" y="8" width="5" height="18" fill="#16130f"/>
+      <rect x="10" y="12" width="5" height="14" fill="#16130f"/>
+      <rect x="17" y="16" width="5" height="10" fill="#16130f"/>
+      <rect x="24" y="20" width="5" height="6" fill="#9e1b28"/>
+    </svg></span><span class="num">8</span> MARKETS · TECH</div>
+    <h3>Anthropic falls after its IPO</h3>
+    <p>Its value drops after the record IPO, and technology shares fall.</p>
+    <cite>ABC, SBS</cite>
+  </article><article class="card">
+    <div class="tag"><span class="icon"><svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <rect x="6" y="3" width="20" height="26" fill="#f4efe4" stroke="#16130f" stroke-width="1.7"/>
+      <circle cx="16" cy="12" r="4" fill="none" stroke="#16130f" stroke-width="1.7"/>
+      <rect x="14.2" y="16" width="3.6" height="6" fill="#16130f"/>
+      <path d="M10 24 H22" stroke="#9e1b28" stroke-width="1.8"/>
+    </svg></span><span class="num">9</span> GAZA · MEDIA</div>
+    <h3>No proof on a Gaza freelancer</h3>
+    <p>Israel’s military declines or ignores ABC’s Hamas-evidence requests.</p>
+    <cite>ABC</cite>
+  </article><article class="card">
+    <div class="tag"><span class="icon"><svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <rect x="8" y="2" width="16" height="28" fill="#f4efe4" stroke="#16130f" stroke-width="1.7"/>
+      <circle cx="16" cy="12" r="5" fill="none" stroke="#9e1b28" stroke-width="1.7"/>
+      <path d="M12 21 H20 M12 25 H18" stroke="#16130f" stroke-width="1.5"/>
+    </svg></span><span class="num">10</span> TEXAS · US</div>
+    <h3>Reinaldo Dennes screams at execution</h3>
+    <p>He reported excruciating pain. The state denies it was botched.</p>
+    <cite>ABC · Saturday</cite>
+  </article><article class="card">
+    <div class="tag"><span class="icon"><svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <ellipse cx="16" cy="20" rx="13" ry="7" fill="#f4efe4" stroke="#16130f" stroke-width="1.7"/>
+      <rect x="7" y="6" width="8" height="10" fill="#f4efe4" stroke="#16130f" stroke-width="1.4"/>
+      <rect x="17" y="4" width="8" height="10" fill="#9e1b28"/>
+    </svg></span><span class="num">11</span> LONDON · EUROPE</div>
+    <h3>Rejoining the EU stays open</h3>
+    <p>After a UK–EU summit, reports say the idea is “on the table.”</p>
+    <cite>ABC</cite>
+  </article></section>
+    <section class="split">
+      <div class="panel">
+        <h2>PLACES</h2>
+        <div class="map-canvas"><svg viewBox="0 0 640 200" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <rect width="640" height="200" fill="#d5e3eb"/>
+    <g stroke="#c3d4de" stroke-width="1">
+      <path d="M0 50 H640 M0 100 H640 M0 150 H640"/>
+    </g>
+    <g fill="#f4efe4" stroke="#16130f" stroke-width="1.5" stroke-linejoin="round">
+      <path d="M28 48 L78 30 L128 36 L168 58 L176 78 L156 102 L118 112 L78 106 L46 118 L34 96 L22 70 Z"/>
+      <path d="M96 122 L142 118 L158 148 L150 186 L116 190 L92 162 Z"/>
+      <path d="M242 40 L258 36 L264 54 L248 60 Z"/>
+      <path d="M266 36 L314 30 L332 48 L318 70 L278 74 L256 56 Z"/>
+      <path d="M268 96 L326 88 L346 120 L332 176 L286 186 L252 150 L248 114 Z"/>
+      <path d="M328 72 L350 76 L342 96 L322 90 Z"/>
+      <path d="M346 34 L440 26 L530 36 L586 62 L578 96 L520 114 L430 112 L360 90 L344 64 Z"/>
+      <path d="M558 56 L584 50 L590 76 L564 82 Z"/>
+      <path d="M498 134 L572 126 L612 150 L590 180 L518 178 L488 156 Z"/>
+    </g>
+    <g>
+      <rect x="135.5" y="65" width="29" height="18" rx="2" fill="#16130f"/>
+      <text x="150" y="78" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#f4efe4">1·6</text>
+    </g><g>
+      <rect x="44.5" y="71" width="15" height="18" rx="2" fill="#16130f"/>
+      <text x="52" y="84" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#f4efe4">3</text>
+    </g><g>
+      <rect x="105" y="89" width="22" height="18" rx="2" fill="#16130f"/>
+      <text x="116" y="102" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#f4efe4">10</text>
+    </g><g>
+      <rect x="239" y="39" width="22" height="18" rx="2" fill="#16130f"/>
+      <text x="250" y="52" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#f4efe4">11</text>
+    </g><g>
+      <rect x="284.5" y="35" width="15" height="18" rx="2" fill="#16130f"/>
+      <text x="292" y="48" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#f4efe4">5</text>
+    </g><g>
+      <rect x="300.5" y="57" width="15" height="18" rx="2" fill="#16130f"/>
+      <text x="308" y="70" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#f4efe4">7</text>
+    </g><g>
+      <rect x="330.5" y="75" width="15" height="18" rx="2" fill="#16130f"/>
+      <text x="338" y="88" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#f4efe4">9</text>
+    </g><g>
+      <rect x="556" y="59" width="36" height="18" rx="2" fill="#16130f"/>
+      <text x="574" y="72" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#f4efe4">2·12</text>
+    </g><g>
+      <rect x="540.5" y="145" width="15" height="18" rx="2" fill="#16130f"/>
+      <text x="548" y="158" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#f4efe4">4</text>
+    </g>
+  </svg></div>
+        <p class="map-note">Numbers match the stories on this page. Markets, story 8, is not pinned to a city.</p>
+      </div>
+      <div class="panel">
+        <h2 class="brief-head">ALSO ON SATURDAY 21 NOVEMBER</h2>
+        <div class="brief">
+    <div class="tag"><span class="icon"><svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <rect x="2" y="6" width="8" height="8" fill="#16130f"/>
+      <rect x="12" y="6" width="8" height="8" fill="#16130f"/>
+      <rect x="22" y="6" width="8" height="8" fill="#9e1b28"/>
+      <rect x="5" y="20" width="22" height="7" fill="none" stroke="#16130f" stroke-width="1.7"/>
+    </svg></span><span class="num">12</span> SEOUL · SOCIETY</div>
+    <h3>Universities form emergency teams for the essay and interview exams amid cheating concerns.</h3>
+    <p>No clear technical fix is reported.</p>
+    <cite>SBS</cite>
+  </div>
+      </div>
+    </section>
+    <aside class="datecheck"><strong>DATE CHECK</strong><p>Left out on purpose. These are Friday 20 November stories, not Saturday’s news: Russian missiles hit three Kyiv bridges; Cyclone Akvan’s India landfall; Friday’s Asian close; the UK–EU food and youth deal itself; COP31’s last-day deadlock; a Russian missile and objects in Polish airspace; Italy’s general strike; the Trump–Xi–Putin trilateral meeting itself; the ICJ Myanmar genocide ruling; Anthropic pricing at $83 and starting Nasdaq trading; GTA VI’s launch.</p></aside>
+    <footer>Every story happened or was first reported on Saturday 21 November 2026 in any time zone.</footer>
+  </main>
+</body>
+</html>

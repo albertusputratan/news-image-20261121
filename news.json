@@ -1,0 +1,146 @@
+{
+  "kicker": "THE WORLD IN ONE DAY",
+  "countLine": "12 STORIES · SATURDAY 21 NOVEMBER 2026",
+  "date": "Saturday 21 November 2026",
+  "deck": "Trump vows a tax on overseas data centres · Korea’s exams begin · A Palisades Fire verdict",
+  "leads": [
+    {
+      "n": 1,
+      "place": "WASHINGTON",
+      "topic": "POLICY",
+      "headline": "Trump vows a “tremendous tax” on data centres built abroad",
+      "detail": "He says the United States must win the AI contest with China. The remarks come as AI and semiconductor shares fall after Anthropic’s market debut.",
+      "source": "ABC, SBS · Saturday",
+      "motif": "levy",
+      "artLabel": "OVERSEAS LEVY"
+    },
+    {
+      "n": 2,
+      "place": "SEOUL",
+      "topic": "EDUCATION",
+      "headline": "South Korea’s essay and interview exams begin",
+      "detail": "Authorities say 111 students were caught in smart-device cheating on this year’s CSAT. The education ministry urged tighter supervision.",
+      "source": "SBS · 21 Nov",
+      "motif": "exams",
+      "artLabel": "EXAM DAY"
+    },
+    {
+      "n": 3,
+      "place": "LOS ANGELES",
+      "topic": "COURTS",
+      "headline": "Rinderknecht found guilty in the Palisades Fire",
+      "detail": "Jonathan Rinderknecht is found guilty at his second trial of sparking the 2025 fire, which killed 12 people.",
+      "source": "ABC · Saturday",
+      "motif": "verdict",
+      "artLabel": "SECOND TRIAL"
+    }
+  ],
+  "features": [
+    {
+      "n": 4,
+      "place": "AUSTRALIA",
+      "topic": "DIPLOMACY",
+      "headline": "Australia strikes an AI deal",
+      "detail": "The deal with China is on talks about artificial intelligence.",
+      "source": "ABC",
+      "motif": "talks"
+    },
+    {
+      "n": 5,
+      "place": "EUROPE",
+      "topic": "PROTEST",
+      "headline": "Students rally across Europe",
+      "detail": "They march over the cost of living, war, and education cuts.",
+      "source": "ABC",
+      "motif": "rally"
+    },
+    {
+      "n": 6,
+      "place": "WASHINGTON",
+      "topic": "DIPLOMACY",
+      "headline": "Korea raised with Xi and Putin",
+      "detail": "Trump says the peninsula was discussed, and he gives no details.",
+      "source": "SBS · 21 Nov",
+      "motif": "talks"
+    },
+    {
+      "n": 7,
+      "place": "TURIN",
+      "topic": "SPORT",
+      "headline": "Alcaraz beats Flavio Cobolli",
+      "detail": "He wears an elastic band on an injured thigh at the ATP Finals.",
+      "source": "ABC",
+      "motif": "tennis"
+    },
+    {
+      "n": 8,
+      "place": "MARKETS",
+      "topic": "TECH",
+      "headline": "Anthropic falls after its IPO",
+      "detail": "Its value drops after the record IPO, and technology shares fall.",
+      "source": "ABC, SBS",
+      "motif": "markets"
+    },
+    {
+      "n": 9,
+      "place": "GAZA",
+      "topic": "MEDIA",
+      "headline": "No proof on a Gaza freelancer",
+      "detail": "Israel’s military declines or ignores ABC’s Hamas-evidence requests.",
+      "source": "ABC",
+      "motif": "press"
+    },
+    {
+      "n": 10,
+      "place": "TEXAS",
+      "topic": "US",
+      "headline": "Reinaldo Dennes screams at execution",
+      "detail": "He reported excruciating pain. The state denies it was botched.",
+      "source": "ABC · Saturday",
+      "motif": "seal"
+    },
+    {
+      "n": 11,
+      "place": "LONDON",
+      "topic": "EUROPE",
+      "headline": "Rejoining the EU stays open",
+      "detail": "After a UK–EU summit, reports say the idea is “on the table.”",
+      "source": "ABC",
+      "motif": "table"
+    }
+  ],
+  "briefs": [
+    {
+      "n": 12,
+      "place": "SEOUL",
+      "topic": "SOCIETY",
+      "headline": "Universities form emergency teams for the essay and interview exams amid cheating concerns.",
+      "detail": "No clear technical fix is reported.",
+      "source": "SBS",
+      "motif": "teams"
+    }
+  ],
+  "labels": {
+    "map": "PLACES",
+    "mapNote": "Numbers match the stories on this page. Markets, story 8, is not pinned to a city.",
+    "briefs": "ALSO ON SATURDAY 21 NOVEMBER"
+  },
+  "dateCheck": {
+    "title": "DATE CHECK",
+    "lead": "Left out on purpose. These are Friday 20 November stories, not Saturday’s news:",
+    "items": [
+      "Russian missiles hit three Kyiv bridges",
+      "Cyclone Akvan’s India landfall",
+      "Friday’s Asian close",
+      "the UK–EU food and youth deal itself",
+      "COP31’s last-day deadlock",
+      "a Russian missile and objects in Polish airspace",
+      "Italy’s general strike",
+      "the Trump–Xi–Putin trilateral meeting itself",
+      "the ICJ Myanmar genocide ruling",
+      "Anthropic pricing at $83 and starting Nasdaq trading",
+      "GTA VI’s launch"
+    ]
+  },
+  "footer": "Every story happened or was first reported on Saturday 21 November 2026 in any time zone."
+}
