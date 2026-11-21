@@ -1,10 +1,8 @@
-import { copyFileSync, mkdirSync } from 'node:fs';
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+// Hands the Saturday 21 November 2026 sheet to the make.fun output folder.
+import * as disk from 'node:fs';
+import * as where from 'node:path';
 
-const here = dirname(fileURLToPath(import.meta.url));
-const src = join(here, 'entry.png');
-const destDir = process.env.MAKEFUN_OUTPUT_DIR ?? '/output';
-mkdirSync(destDir, { recursive: true });
-const dest = join(destDir, 'entry.png');
-copyFileSync(src, dest);
+const sheetPath = where.join(import.meta.dirname, 'entry.png');
+const dropFolder = process.env.MAKEFUN_OUTPUT_DIR ?? '/output';
+disk.mkdirSync(dropFolder, { recursive: true });
+disk.copyFileSync(sheetPath, where.join(dropFolder, 'entry.png'));
