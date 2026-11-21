@@ -1,146 +1,327 @@
 {
   "kicker": "THE WORLD IN ONE DAY",
-  "countLine": "12 STORIES · SATURDAY 21 NOVEMBER 2026",
+  "countLine": "29 STORIES · 5 REGIONS · SATURDAY 21 NOVEMBER 2026",
   "date": "Saturday 21 November 2026",
-  "deck": "Trump vows a tax on overseas data centres · Korea’s exams begin · A Palisades Fire verdict",
+  "deck": "Korea’s entrance exams open · Homebirth rallies across Australia · IRGC claims a Hormuz drone intercept",
+  "regions": ["East Asia", "South Asia", "Oceania", "Africa", "Middle East"],
   "leads": [
     {
       "n": 1,
-      "place": "WASHINGTON",
-      "topic": "POLICY",
-      "headline": "Trump vows a “tremendous tax” on data centres built abroad",
-      "detail": "He says the United States must win the AI contest with China. The remarks come as AI and semiconductor shares fall after Anthropic’s market debut.",
-      "source": "ABC, SBS · Saturday",
-      "motif": "levy",
-      "artLabel": "OVERSEAS LEVY"
+      "region": "East Asia",
+      "place": "SEOUL",
+      "topic": "EDUCATION",
+      "headline": "Essay and interview exams begin this weekend",
+      "detail": "Fourteen universities hold essay exams, among them Konkuk, Kyung Hee, Korea and Sogang (natural sciences), Sungkyunkwan (language), Sookmyung and Soongsil. Yonsei and Ewha start interviews on the 21st.",
+      "source": "Aju Press; MK",
+      "motif": "exams",
+      "artLabel": "EXAM WEEKEND"
     },
     {
       "n": 2,
-      "place": "SEOUL",
-      "topic": "EDUCATION",
-      "headline": "South Korea’s essay and interview exams begin",
-      "detail": "Authorities say 111 students were caught in smart-device cheating on this year’s CSAT. The education ministry urged tighter supervision.",
-      "source": "SBS · 21 Nov",
-      "motif": "exams",
-      "artLabel": "EXAM DAY"
+      "region": "Oceania",
+      "place": "AUSTRALIA",
+      "topic": "HEALTH",
+      "headline": "Rallies warn homebirth access may collapse",
+      "detail": "Dozens of rallies in cities and towns say new insurance rules will bring a “catastrophic collapse” in midwife-supported homebirth access, and that freebirths will soar.",
+      "source": "ABC · Sat 21 Nov, 1:51pm",
+      "motif": "homebirth",
+      "artLabel": "HOMEBIRTH RALLIES"
     },
     {
       "n": 3,
-      "place": "LOS ANGELES",
-      "topic": "COURTS",
-      "headline": "Rinderknecht found guilty in the Palisades Fire",
-      "detail": "Jonathan Rinderknecht is found guilty at his second trial of sparking the 2025 fire, which killed 12 people.",
-      "source": "ABC · Saturday",
-      "motif": "verdict",
-      "artLabel": "SECOND TRIAL"
+      "region": "Middle East",
+      "place": "HORMUZ",
+      "topic": "MILITARY",
+      "headline": "IRGC says it shot down a US MQ-9 drone",
+      "detail": "Iran’s IRGC says the drone fell over the Strait of Hormuz and calls it the 58th it has downed. The report is a claim, not a confirmed US loss.",
+      "source": "Al Jazeera · 21 Nov, 03:15 UTC; IRNA",
+      "motif": "strait",
+      "artLabel": "CLAIM, NOT CONFIRMED"
     }
   ],
   "features": [
     {
       "n": 4,
+      "region": "Oceania",
       "place": "AUSTRALIA",
-      "topic": "DIPLOMACY",
-      "headline": "Australia strikes an AI deal",
-      "detail": "The deal with China is on talks about artificial intelligence.",
-      "source": "ABC",
-      "motif": "talks"
+      "topic": "CRICKET",
+      "headline": "Board backs Cummins as captain",
+      "detail": "Cricket Australia’s board is unanimous while the sandpaper controversy continues.",
+      "source": "ABC · Sat 21 Nov, 3:05pm",
+      "motif": "cricket"
     },
     {
       "n": 5,
-      "place": "EUROPE",
-      "topic": "PROTEST",
-      "headline": "Students rally across Europe",
-      "detail": "They march over the cost of living, war, and education cuts.",
-      "source": "ABC",
-      "motif": "rally"
+      "region": "Oceania",
+      "place": "SYDNEY",
+      "topic": "CRIME",
+      "headline": "Teens stabbed at a shopping centre",
+      "detail": "Two boys were stabbed and a 17-year-old was charged. Police say they were lucky to be alive.",
+      "source": "ABC · Sat 21 Nov, 3:12pm",
+      "motif": "shops"
     },
     {
       "n": 6,
-      "place": "WASHINGTON",
-      "topic": "DIPLOMACY",
-      "headline": "Korea raised with Xi and Putin",
-      "detail": "Trump says the peninsula was discussed, and he gives no details.",
-      "source": "SBS · 21 Nov",
-      "motif": "talks"
+      "region": "Oceania",
+      "place": "TOCUMWAL",
+      "topic": "WEATHER",
+      "headline": "Lightning strikes four at a festival",
+      "detail": "It happened at Strawberry Fields, Tocumwal, NSW, after wild weather overnight.",
+      "source": "ABC · Sat 21 Nov, 1:39pm",
+      "motif": "bolt"
     },
     {
       "n": 7,
-      "place": "TURIN",
-      "topic": "SPORT",
-      "headline": "Alcaraz beats Flavio Cobolli",
-      "detail": "He wears an elastic band on an injured thigh at the ATP Finals.",
-      "source": "ABC",
-      "motif": "tennis"
+      "region": "Oceania",
+      "place": "KIRUP",
+      "topic": "ROADS",
+      "headline": "Boy, 11, killed on a highway",
+      "detail": "A ute hit him as he crossed South Western Highway in Kirup, south of Perth.",
+      "source": "ABC · Sat 21 Nov, 2:33pm",
+      "motif": "road"
     },
     {
       "n": 8,
-      "place": "MARKETS",
-      "topic": "TECH",
-      "headline": "Anthropic falls after its IPO",
-      "detail": "Its value drops after the record IPO, and technology shares fall.",
-      "source": "ABC, SBS",
-      "motif": "markets"
+      "region": "Oceania",
+      "place": "GOLD COAST",
+      "topic": "SOCIETY",
+      "headline": "Schoolies begins; numbers are down",
+      "detail": "Thousands of leavers arrive. Organisers add pickleball and line dancing.",
+      "source": "ABC · Sat 21 Nov, 12:12pm",
+      "motif": "crowd"
     },
     {
       "n": 9,
-      "place": "GAZA",
-      "topic": "MEDIA",
-      "headline": "No proof on a Gaza freelancer",
-      "detail": "Israel’s military declines or ignores ABC’s Hamas-evidence requests.",
-      "source": "ABC",
-      "motif": "press"
+      "region": "East Asia",
+      "place": "JAPAN",
+      "topic": "TECHNOLOGY",
+      "headline": "Ministry weighs blocking extortion sites",
+      "detail": "After a GMO access case, critics say ISP cut-offs may breach secrecy of communications.",
+      "source": "Asahi · 21 Nov morning",
+      "motif": "block"
     },
     {
       "n": 10,
-      "place": "TEXAS",
-      "topic": "US",
-      "headline": "Reinaldo Dennes screams at execution",
-      "detail": "He reported excruciating pain. The state denies it was botched.",
-      "source": "ABC · Saturday",
-      "motif": "seal"
+      "region": "East Asia",
+      "place": "JAPAN",
+      "topic": "FOOTBALL",
+      "headline": "Tashima stays in the FIFA race",
+      "detail": "He is a March candidate with the incumbent and the French FA president, and he is not withdrawing.",
+      "source": "Asahi · 21 Nov morning",
+      "motif": "ball"
     },
     {
       "n": 11,
-      "place": "LONDON",
-      "topic": "EUROPE",
-      "headline": "Rejoining the EU stays open",
-      "detail": "After a UK–EU summit, reports say the idea is “on the table.”",
-      "source": "ABC",
-      "motif": "table"
+      "region": "Oceania",
+      "place": "AUSTRALIA",
+      "topic": "SPORT",
+      "headline": "Petition opposes junior AI cameras",
+      "detail": "The petition targets a Basketball Australia trial of smart cameras.",
+      "source": "ABC · Sat 21 Nov, 10:49am",
+      "motif": "camera"
+    },
+    {
+      "n": 12,
+      "region": "Africa",
+      "place": "KENYA",
+      "topic": "POLITICS",
+      "headline": "Party seeks orders on IEBC chief",
+      "detail": "It wants a court to stop the appointment of the electoral commission’s CEO.",
+      "source": "The Standard · 21 Nov, 04:00 GMT",
+      "motif": "court"
+    },
+    {
+      "n": 13,
+      "region": "Africa",
+      "place": "SOUTH AFRICA",
+      "topic": "CRIME",
+      "headline": "Report: nearly 600 women killed",
+      "detail": "Premium Times published a three-month total on Saturday, not a single-day toll.",
+      "source": "Premium Times · 21 Nov, 03:47 GMT",
+      "motif": "report"
     }
   ],
   "briefs": [
     {
-      "n": 12,
-      "place": "SEOUL",
-      "topic": "SOCIETY",
-      "headline": "Universities form emergency teams for the essay and interview exams amid cheating concerns.",
-      "detail": "No clear technical fix is reported.",
-      "source": "SBS",
-      "motif": "teams"
+      "n": 14,
+      "region": "South Asia",
+      "place": "PAKISTAN",
+      "topic": "POLITICS",
+      "line": "Gohar seeks fair treatment for detained PTI workers, their security, and reserved seats.",
+      "source": "Dawn · 21 Nov",
+      "motif": "generic"
+    },
+    {
+      "n": 15,
+      "region": "South Asia",
+      "place": "BAHAWALPUR",
+      "topic": "ACCIDENT",
+      "line": "A phone explodes on an e-bus; passengers smash glass; some minor injuries.",
+      "source": "Dawn · 21 Nov",
+      "motif": "generic"
+    },
+    {
+      "n": 16,
+      "region": "Africa",
+      "place": "ESWATINI",
+      "topic": "ENVIRONMENT",
+      "line": "Dirty foam on the Ngwempisi River sparks a pollution probe.",
+      "source": "Times of Eswatini · 21 Nov",
+      "motif": "generic"
+    },
+    {
+      "n": 17,
+      "region": "Oceania",
+      "place": "CANBERRA",
+      "topic": "SAFETY",
+      "line": "Authorities probe a four-minute Triple Zero outage and a failed power backup.",
+      "source": "ABC · Sat 21 Nov",
+      "motif": "generic"
+    },
+    {
+      "n": 18,
+      "region": "East Asia",
+      "place": "KYOTO",
+      "topic": "EDUCATION",
+      "line": "Staff covered ¥54m in unpaid school fees; about ¥37m is due back to the principal.",
+      "source": "Asahi · 21 Nov",
+      "motif": "generic"
+    },
+    {
+      "n": 19,
+      "region": "South Asia",
+      "place": "PUNJAB",
+      "topic": "ECONOMY",
+      "line": "Mills get wheat at Rs4,500 per 40kg; a 10kg flour bag is to retail at Rs1,275.",
+      "source": "Dawn · 21 Nov",
+      "motif": "generic"
+    },
+    {
+      "n": 20,
+      "region": "South Asia",
+      "place": "PAKISTAN",
+      "topic": "TECHNOLOGY",
+      "line": "Saturday report: Pakistan up 17 e-government places, to High; telecoms score 0.6590.",
+      "source": "Dawn · 21 Nov",
+      "motif": "generic"
+    },
+    {
+      "n": 21,
+      "region": "South Asia",
+      "place": "PUNJAB",
+      "topic": "ENVIRONMENT",
+      "line": "Gujranwala and Multan pass Lahore on air pollution; four other cities are high.",
+      "source": "Dawn · 21 Nov",
+      "motif": "generic"
+    },
+    {
+      "n": 22,
+      "region": "South Asia",
+      "place": "PAKISTAN",
+      "topic": "COURTS",
+      "line": "A magistrate indicts anchorperson Iqrarul Hassan for cyberterrorism.",
+      "source": "Dawn · 21 Nov",
+      "motif": "generic"
+    },
+    {
+      "n": 23,
+      "region": "South Asia",
+      "place": "SINDH",
+      "topic": "HEALTH",
+      "line": "The assembly takes up rising dog bites; Sharjeel says hospital staff lack protocols.",
+      "source": "Dawn · 21 Nov",
+      "motif": "generic"
+    },
+    {
+      "n": 24,
+      "region": "South Asia",
+      "place": "PAKISTAN",
+      "topic": "REGULATION",
+      "line": "SECP will take filings only when the auditor’s report has a valid UDIN.",
+      "source": "Dawn · 21 Nov",
+      "motif": "generic"
+    },
+    {
+      "n": 25,
+      "region": "Africa",
+      "place": "NIGERIA",
+      "topic": "POLITICS",
+      "line": "Peter Obi vows to end kidnappings and corruption.",
+      "source": "Punch · 21 Nov",
+      "motif": "generic"
+    },
+    {
+      "n": 26,
+      "region": "South Asia",
+      "place": "PAKISTAN",
+      "topic": "ECONOMY",
+      "line": "The ECC lowers the SME export threshold and approves supplementary grants.",
+      "source": "Dawn · 21 Nov",
+      "motif": "generic"
+    },
+    {
+      "n": 27,
+      "region": "South Asia",
+      "place": "BALOCHISTAN",
+      "topic": "POLITICS",
+      "line": "The assembly wants Quetta–Sukkur flights and votes on officers, TV offices and media jobs.",
+      "source": "Dawn · 21 Nov",
+      "motif": "generic"
+    },
+    {
+      "n": 28,
+      "region": "South Asia",
+      "place": "PAKISTAN",
+      "topic": "INDUSTRY",
+      "line": "Digital monitoring is ordered for paper and rexine plants, not firms that only cut and print.",
+      "source": "Dawn · 21 Nov",
+      "motif": "generic"
+    },
+    {
+      "n": 29,
+      "region": "Oceania",
+      "place": "AUSTRALIA",
+      "topic": "COURTS",
+      "line": "A secret police recording of Raelene Polymiadis is released.",
+      "source": "ABC · Sat 21 Nov",
+      "motif": "generic"
     }
   ],
   "labels": {
     "map": "PLACES",
-    "mapNote": "Numbers match the stories on this page. Markets, story 8, is not pinned to a city.",
+    "mapNote": "AU, PK and JP group the Australia, Pakistan and Japan stories. Other pins are story numbers.",
     "briefs": "ALSO ON SATURDAY 21 NOVEMBER"
   },
   "dateCheck": {
     "title": "DATE CHECK",
-    "lead": "Left out on purpose. These are Friday 20 November stories, not Saturday’s news:",
+    "lead": "Left out on purpose. These happened or were first widely reported on Thursday 19 or Friday 20 November, not Saturday’s news:",
     "items": [
-      "Russian missiles hit three Kyiv bridges",
-      "Cyclone Akvan’s India landfall",
-      "Friday’s Asian close",
-      "the UK–EU food and youth deal itself",
-      "COP31’s last-day deadlock",
-      "a Russian missile and objects in Polish airspace",
-      "Italy’s general strike",
-      "the Trump–Xi–Putin trilateral meeting itself",
-      "the ICJ Myanmar genocide ruling",
-      "Anthropic pricing at $83 and starting Nasdaq trading",
-      "GTA VI’s launch"
+      "Trump’s “tremendous tax” on overseas data centres (Fri 20 Nov)",
+      "Rinderknecht Palisades Fire verdict (Fri 20 Nov)",
+      "Reinaldo Dennes execution in Texas (Thu 19 Nov)",
+      "Alcaraz beats Cobolli at the ATP Finals (Fri)",
+      "Harry Kane ankle ligament injury, Bayern v Cologne (Fri)",
+      "European student and cost-of-living rallies (Fri)",
+      "Australia–China agreement on AI talks (Fri)",
+      "UK–EU food and youth deal, and “rejoin on the table” summit coverage (Fri)",
+      "COP31 overtime and a draft dropping fossil-fuel language (Fri)",
+      "Russian strikes on Kyiv and Dnipro bridges and Friday’s wider Ukraine attack",
+      "A Russian missile and objects in Polish airspace (Fri)",
+      "Italy’s general strike (Fri)",
+      "The Trump–Xi–Putin trilateral meeting itself (Thu 19 Nov in Shenzhen)",
+      "ICJ Myanmar/Rohingya genocide ruling",
+      "Anthropic $83 pricing, IPO first trade, and Friday’s Asian close",
+      "GTA VI’s launch",
+      "Denmark’s expulsion of a Russian diplomat over an alleged plot to kill a US-Ukrainian rapper (Fri)",
+      "French court sentences three officers in the Michel Zecler case (Fri)",
+      "Nikhil Gupta sentenced in the Pannun plot (Fri)",
+      "Voyager 1 reaching one light-day (18 Nov)",
+      "India–Japan firing-range and live-fire cooperation (Thu/Fri)",
+      "UNESCO $35bn pre-primary report on World Children’s Day (Fri 20 Nov)",
+      "Saudi-led strikes on Hodeidah and Friday Jazan intercepts",
+      "Trump’s Friday remark that Korea was discussed at the trilateral",
+      "Cyclone Akvan’s India landfall (Fri)"
     ]
   },
-  "footer": "Every story happened or was first reported on Saturday 21 November 2026 in any time zone."
+  "footer": "Every story on this page happened or was first reported on Saturday 21 November 2026 in any time zone. Friday’s news is in the date check, not on the page."
 }
