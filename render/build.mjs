@@ -1,533 +1,607 @@
-/**
- * Saturday 21 November 2026 broadsheet.
- * Edit ../news.json, then run: node render/build.mjs
- */
-import { readFileSync, writeFileSync, unlinkSync, mkdirSync } from 'node:fs';
-import { dirname, join, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { spawnSync } from 'node:child_process';
+import { readFile, writeFile, rm } from "node:fs/promises";
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
 
+const execFileAsync = promisify(execFile);
 const here = dirname(fileURLToPath(import.meta.url));
-const root = resolve(here, '..');
-const news = JSON.parse(readFileSync(join(root, 'news.json'), 'utf8'));
+const root = join(here, "..");
+const PAGE = 1024;
+const M = 16;
+const INNER = PAGE - 2 * M;
 
-const INK = '#16130f';
-const PAPER = '#F5F0E6';
-const RED = '#9e1b28';
-const REGIONS = ['Europe', 'Middle East', 'Africa', 'South Asia', 'East Asia', 'Oceania', 'Americas', 'Global'];
-const COLOUR = {
-  Europe: '#1d4e89',
-  'Middle East': '#9e1b28',
-  Africa: '#2a6b45',
-  'South Asia': '#a16207',
-  'East Asia': '#0f6e78',
-  Oceania: '#334e99',
-  Americas: '#6a3d96',
-  Global: '#3f3a34',
-};
+const news = JSON.parse(await readFile(join(root, "news.json"), "utf8"));
+const byId = new Map(news.stories.map((s) => [s.id, s]));
+const regionById = new Map(news.regions.map((r) => [r.id, r]));
 
-function esc(value) {
-  return String(value)
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;');
+function fail(msg) {
+  console.error(msg);
+  process.exit(1);
 }
 
-function allStories() {
-  return [...news.leads, ...news.features, ...news.briefs];
+if (news.stories.length !== 49) fail(`expected 49 stories, got ${news.stories.length}`);
+for (let i = 1; i <= 49; i++) if (!byId.has(i)) fail(`missing story ${i}`);
+const counted = {};
+for (const s of news.stories) counted[s.region] = (counted[s.region] || 0) + 1;
+for (const r of news.regions) {
+  if (counted[r.id] !== r.count) fail(`${r.id} count ${counted[r.id]} != ${r.count}`);
+}
+if (news.regions.reduce((s, r) => s + r.count, 0) !== 49) fail("region bar does not sum to 49");
+
+const yKicker = 16;
+const hKicker = 13;
+const yDate = 30;
+const hDate = 50;
+const yKpi = 82;
+const hKpi = 20;
+const yUtc = 104;
+const hUtc = 30;
+const yRegion = 136;
+const hRegion = 16;
+const yLead = 156;
+const hLead = 240;
+const yMid = 400;
+const hMid = 108;
+const midGap = 5;
+const midEnd = yMid + hMid * 2 + midGap;
+const yLower = midEnd + 5;
+const yFooter = 994;
+const hFooter = 14;
+if (yFooter + hFooter !== 1008) fail("footer does not sit on the 16px bottom margin");
+
+const leadW = 242;
+const leadG = 8;
+const midW = 192;
+const midG = 8;
+const mapW = 360;
+const mapH = 136;
+const colG = 8;
+const briefsW = INNER - mapW - 8;
+const colW = (briefsW - 2 * colG) / 3;
+
+const LAT_MAX = 78;
+const LAT_SPAN = (mapH / mapW) * 360;
+const LAT_MIN = LAT_MAX - LAT_SPAN;
+
+function project(lon, lat) {
+  return [((lon + 180) / 360) * mapW, ((LAT_MAX - lat) / LAT_SPAN) * mapH];
 }
 
-function validate() {
-  const list = allStories();
-  if (list.length !== 49) throw new Error(`expected 49 stories, got ${list.length}`);
-  if (news.leads.length !== 4) throw new Error('need 4 leads');
-  if (news.features.length !== 10) throw new Error('need 10 mid cards');
-  if (news.date !== 'Saturday 21 November 2026') throw new Error('date');
-  if (!news.countLine.startsWith('49 STORIES · 7 REGIONS')) throw new Error('count line');
-  if (!news.dateCheck.notYet.includes('Not yet:')) throw new Error('not yet line');
-  const ids = new Set();
-  for (const story of list) {
-    if (ids.has(story.n)) throw new Error(`duplicate ${story.n}`);
-    ids.add(story.n);
-    if (!REGIONS.includes(story.region)) throw new Error(`region on ${story.n}`);
-    if (!story.source || !story.tag) throw new Error(`source/tag on ${story.n}`);
-    if (!['OFFICIAL', 'CONFIRMED', 'REPORTED', 'CLAIM'].includes(story.tag)) {
-      throw new Error(`bad tag on ${story.n}`);
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
+function countLines(text, maxChars) {
+  const limit = Math.max(8, maxChars);
+  const words = String(text).split(/\s+/).filter(Boolean);
+  let lines = 1;
+  let col = 0;
+  for (const word of words) {
+    if (col === 0) {
+      col = word.length;
+      if (word.length > limit) lines += Math.ceil(word.length / limit) - 1;
+    } else if (col + 1 + word.length <= limit) col += 1 + word.length;
+    else {
+      lines += 1;
+      col = word.length;
     }
   }
-  for (let n = 1; n <= 49; n += 1) {
-    if (!ids.has(n)) throw new Error(`missing story ${n}`);
+  return lines;
+}
+
+function fontFace(family, file, weight, style) {
+  const b64 = readFileSync(file).toString("base64");
+  return `@font-face{font-family:"${family}";src:url(data:font/ttf;base64,${b64}) format("truetype");font-weight:${weight};font-style:${style};font-display:block;}`;
+}
+
+const fontCss = [
+  fontFace("Playfair Display", "/usr/share/fonts/truetype/sand-box/google/Playfair Display/PlayfairDisplay-VariableFont_wght.ttf", "400 900", "normal"),
+  fontFace("Inter", "/usr/share/fonts/truetype/sand-box/google/Inter/Inter-VariableFont_opsz,wght.ttf", "100 900", "normal"),
+  fontFace("Source Serif Pro", "/usr/share/fonts/truetype/sand-box/custom/Source Serif Pro/SourceSerifPro-Regular.ttf", "400", "normal"),
+  fontFace("Source Serif Pro", "/usr/share/fonts/truetype/sand-box/custom/Source Serif Pro/SourceSerifPro-Bold.ttf", "700", "normal"),
+  fontFace("Source Serif Pro", "/usr/share/fonts/truetype/sand-box/custom/Source Serif Pro/SourceSerifPro-It.ttf", "400", "italic"),
+].join("");
+
+function segWidths() {
+  const widths = news.regions.map((r) => Math.floor((INNER * r.count) / 49));
+  let used = widths.reduce((a, b) => a + b, 0);
+  widths[widths.length - 1] += INNER - used;
+  if (widths[widths.length - 1] < 54) {
+    const need = 54 - widths[widths.length - 1];
+    widths[widths.length - 1] = 54;
+    widths[0] -= need;
   }
+  if (widths.reduce((a, b) => a + b, 0) !== INNER) fail("region bar width drift");
+  return widths;
 }
 
-function svg(vb, body) {
-  return `<svg viewBox="${vb}" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${body}</svg>`;
+const dcText = `${news.dateCheck.intro} ${news.dateCheck.items.join("; ")}. ${news.dateCheck.notYet}`;
+const dcFont = 7.6;
+const dcInnerW = INNER - 16;
+const dcChars = Math.floor(dcInnerW / (dcFont * 0.46));
+const dcLines = countLines(dcText, dcChars);
+const dcTitleH = 22;
+const dcPad = 5;
+const dcLineH = 9.4;
+const dcH = dcTitleH + dcPad * 2 + dcLines * dcLineH;
+const dcY = yFooter - 4 - dcH;
+const lowerH = dcY - 4 - yLower;
+const briefAreaH = lowerH - 16;
+if (lowerH < 230) fail(`lower band ${lowerH}px is too short for the map and briefs`);
+if (yLower + lowerH + 4 > dcY) fail("briefs collide with DATE CHECK");
+if (dcY - (yLower + lowerH) < 3) fail("need >= 3px between briefs and DATE CHECK");
+
+function columnHeight(regionIds, fontPx) {
+  const lineH = fontPx + 1.9;
+  const headH = 12;
+  const chars = Math.floor((colW - 8) / (fontPx * 0.505));
+  let h = 0;
+  for (const rid of regionIds) {
+    h += headH;
+    for (const s of news.stories) {
+      if (s.role !== "brief" || s.region !== rid) continue;
+      const text = `${s.id} ${s.line} ${s.source} · ${s.tag}`;
+      h += countLines(text, chars) * lineH;
+    }
+  }
+  return h;
 }
 
-const ART = {
-  cop: svg('0 0 320 160', `
-    <rect width="320" height="160" fill="#e7e1d4"/>
-    <rect x="0" y="118" width="320" height="42" fill="#cfc6b4"/>
-    <g fill="#1d4e89">
-      <rect x="28" y="78" width="22" height="40"/><rect x="58" y="70" width="22" height="48"/>
-      <rect x="88" y="84" width="22" height="34"/><rect x="118" y="74" width="22" height="44"/>
-      <rect x="148" y="88" width="22" height="30"/>
-    </g>
-    <rect x="196" y="36" width="92" height="70" fill="#f7f3ea" stroke="${INK}" stroke-width="2"/>
-    <path d="M208 52 H276 M208 64 H268 M208 76 H250" stroke="${INK}" stroke-width="2"/>
-    <circle cx="250" cy="28" r="16" fill="none" stroke="${RED}" stroke-width="3"/>
-    <path d="M250 28 V18 M250 28 L258 32" stroke="${RED}" stroke-width="2"/>
-  `),
-  riyadh: svg('0 0 320 160', `
-    <rect width="320" height="160" fill="#1c2a44"/>
-    <rect y="118" width="320" height="42" fill="#141c2e"/>
-    <g fill="#d9d0c0">
-      <rect x="24" y="70" width="18" height="48"/><rect x="48" y="48" width="26" height="70"/>
-      <rect x="80" y="78" width="16" height="40"/><rect x="102" y="40" width="22" height="78"/>
-      <rect x="130" y="62" width="18" height="56"/>
-    </g>
-    <g fill="#8fd0ff">
-      <rect x="54" y="58" width="6" height="4"/><rect x="108" y="52" width="6" height="4"/>
-      <rect x="136" y="74" width="5" height="4"/>
-    </g>
-    <path d="M40 30 L150 78" stroke="${RED}" stroke-width="2"/>
-    <path d="M210 18 L160 70" stroke="${RED}" stroke-width="2"/>
-    <path d="M250 24 L190 84" stroke="#f2c14e" stroke-width="2"/>
-    <circle cx="150" cy="78" r="3" fill="${RED}"/>
-    <circle cx="160" cy="70" r="3" fill="${RED}"/>
-    <circle cx="190" cy="84" r="3" fill="#f2c14e"/>
-  `),
-  quake: svg('0 0 320 160', `
-    <rect width="320" height="160" fill="#efe4d2"/>
-    <polygon points="0,120 70,48 130,120" fill="#b08968"/>
-    <polygon points="90,120 170,36 250,120" fill="#8c6248"/>
-    <polygon points="200,120 270,64 320,120" fill="#c4a484"/>
-    <path d="M16 132 H70 L86 118 L100 140 L118 124 L140 136 H300" fill="none" stroke="${INK}" stroke-width="2.4"/>
-    <circle cx="168" cy="78" r="7" fill="${RED}"/>
-    <circle cx="168" cy="78" r="14" fill="none" stroke="${RED}" stroke-width="2"/>
-  `),
-  nato: svg('0 0 320 160', `
-    <rect width="320" height="160" fill="#e4eaf2"/>
-    <rect x="70" y="78" width="180" height="16" fill="#243044"/>
-    <rect x="148" y="46" width="24" height="34" fill="#243044"/>
-    <rect x="40" y="28" width="4" height="90" fill="${INK}"/>
-    <rect x="276" y="28" width="4" height="90" fill="${INK}"/>
-    <rect x="18" y="28" width="36" height="24" fill="#f4f4f4" stroke="${INK}"/>
-    <rect x="18" y="40" width="36" height="12" fill="${RED}"/>
-    <rect x="266" y="28" width="36" height="24" fill="#1d4e89"/>
-    <circle cx="160" cy="58" r="8" fill="none" stroke="#f4f4f4" stroke-width="2"/>
-  `),
-  drones: svg('0 0 320 90', `
-    <rect width="320" height="90" fill="#1b2838"/>
-    <g fill="#d5dde8">
-      <rect x="30" y="58" width="10" height="22"/><rect x="70" y="48" width="16" height="32"/>
-      <rect x="230" y="52" width="14" height="28"/><rect x="270" y="60" width="12" height="20"/>
-    </g>
-    <g fill="none" stroke="#e8eef6" stroke-width="1.4">
-      <path d="M40 20 h14 M47 13 v14"/><path d="M90 28 h12 M96 22 v12"/>
-      <path d="M140 16 h16 M148 8 v16"/><path d="M190 24 h12 M196 18 v12"/>
-      <path d="M250 14 h14 M257 7 v14"/>
-    </g>
-    <path d="M20 8 L120 40" stroke="${RED}" stroke-width="1.6"/>
-    <path d="M300 6 L210 36" stroke="#f2c14e" stroke-width="1.6"/>
-    <path d="M160 4 L150 30" stroke="#f2c14e" stroke-width="1.6"/>
-  `),
-  budget: svg('0 0 320 90', `
-    <rect width="320" height="90" fill="#e7eef6"/>
-    <rect x="36" y="28" width="36" height="46" fill="#1d4e89"/>
-    <rect x="84" y="40" width="36" height="34" fill="#9e1b28"/>
-    <rect x="150" y="18" width="140" height="56" fill="#f7f3ea" stroke="${INK}" stroke-width="2"/>
-    <text x="220" y="54" text-anchor="middle" font-family="Inter, sans-serif" font-size="22" font-weight="700" fill="${INK}">€</text>
-  `),
-  robots: svg('0 0 320 90', `
-    <rect width="320" height="90" fill="#efe8dc"/>
-    <rect x="28" y="16" width="90" height="60" fill="#f7f3ea" stroke="${INK}" stroke-width="2"/>
-    <path d="M40 32 H106 M40 44 H100 M40 56 H80" stroke="${INK}" stroke-width="2"/>
-    <path d="M150 18 L210 70 M210 18 L150 70" stroke="${RED}" stroke-width="6"/>
-    <rect x="230" y="28" width="18" height="28" fill="${INK}"/>
-    <circle cx="239" cy="22" r="8" fill="${INK}"/>
-    <path d="M248 40 H286" stroke="${INK}" stroke-width="4"/>
-  `),
-  plane: svg('0 0 320 90', `
-    <rect width="320" height="90" fill="#d9e7f2"/>
-    <rect y="62" width="320" height="28" fill="#c5b89a"/>
-    <path d="M36 58 H250" stroke="#f7f3ea" stroke-width="3" stroke-dasharray="10 8"/>
-    <g fill="${INK}">
-      <polygon points="70,52 210,46 214,54 70,56"/>
-      <polygon points="120,48 150,28 158,30 140,50"/>
-      <polygon points="150,52 190,70 170,70 140,54"/>
-    </g>
-    <text x="262" y="40" font-family="Inter, sans-serif" font-size="20" font-weight="700" fill="${INK}">146</text>
-  `),
-  liquor: svg('0 0 320 90', `
-    <rect width="320" height="90" fill="#f3ead8"/>
-    <rect x="36" y="28" width="16" height="40" rx="2" fill="#1d4e89"/>
-    <rect x="60" y="34" width="14" height="34" rx="2" fill="#1d4e89"/>
-    <rect x="82" y="24" width="16" height="44" rx="2" fill="#9e1b28"/>
-    <polygon points="150,18 178,70 122,70" fill="none" stroke="${RED}" stroke-width="4"/>
-    <rect x="146" y="38" width="8" height="16" fill="${RED}"/>
-    <rect x="200" y="30" width="80" height="40" fill="#f7f3ea" stroke="${INK}" stroke-width="2"/>
-    <path d="M236 30 V70 M216 50 H264" stroke="${RED}" stroke-width="3"/>
-  `),
-  factory: svg('0 0 320 90', `
-    <rect width="320" height="90" fill="#e7e2d6"/>
-    <polygon points="20,70 20,40 50,28 80,40 80,70" fill="#243044"/>
-    <polygon points="80,70 80,36 110,24 140,36 140,70" fill="#34506a"/>
-    <rect x="150" y="34" width="70" height="36" fill="#243044"/>
-    <rect x="230" y="22" width="10" height="48" fill="#6a6258"/>
-    <circle cx="250" cy="48" r="6" fill="${INK}"/>
-    <rect x="244" y="54" width="12" height="16" fill="${INK}"/>
-    <circle cx="274" cy="50" r="6" fill="${RED}"/>
-    <rect x="268" y="56" width="12" height="14" fill="${RED}"/>
-  `),
-  cricket: svg('0 0 320 90', `
-    <rect width="320" height="90" fill="#e5f0df"/>
-    <ellipse cx="160" cy="70" rx="120" ry="16" fill="#c9d8b0" stroke="${INK}" stroke-width="1.5"/>
-    <rect x="250" y="28" width="4" height="28" fill="${INK}"/>
-    <rect x="262" y="28" width="4" height="28" fill="${INK}"/>
-    <rect x="246" y="26" width="24" height="4" fill="${INK}"/>
-    <rect x="40" y="22" width="90" height="40" fill="#16324f"/>
-    <text x="85" y="48" text-anchor="middle" font-family="Inter, sans-serif" font-size="16" font-weight="700" fill="#f5f0e6">486-4</text>
-  `),
-  mercury: svg('0 0 320 90', `
-    <rect width="320" height="90" fill="#101820"/>
-    <circle cx="210" cy="46" r="30" fill="#b7aea2"/>
-    <circle cx="198" cy="38" r="6" fill="#8d857c"/>
-    <circle cx="222" cy="52" r="4" fill="#8d857c"/>
-    <rect x="48" y="40" width="28" height="12" fill="#d9e2ea"/>
-    <rect x="74" y="42" width="22" height="8" fill="#9fb4c6"/>
-    <path d="M96 46 H150" stroke="#f2c14e" stroke-width="2"/>
-  `),
-  rugby: svg('0 0 320 90', `
-    <rect width="320" height="90" fill="#e7f2e4"/>
-    <rect x="70" y="20" width="6" height="56" fill="${INK}"/>
-    <rect x="108" y="20" width="6" height="56" fill="${INK}"/>
-    <rect x="58" y="20" width="68" height="5" fill="${INK}"/>
-    <ellipse cx="210" cy="48" rx="28" ry="16" fill="#f7f3ea" stroke="${INK}" stroke-width="2"/>
-    <text x="250" y="54" font-family="Inter, sans-serif" font-size="18" font-weight="700" fill="${INK}">37-12</text>
-  `),
-  grid: svg('0 0 320 90', `
-    <rect width="320" height="90" fill="#2a2e34"/>
-    <path d="M0 68 H320" stroke="#f2f2f2" stroke-width="3" stroke-dasharray="14 10"/>
-    <g fill="#d0d5dc">
-      <rect x="36" y="40" width="46" height="12" rx="3"/>
-      <rect x="48" y="36" width="16" height="6"/>
-      <circle cx="46" cy="54" r="4"/><circle cx="72" cy="54" r="4"/>
-    </g>
-    <text x="120" y="50" font-family="Inter, sans-serif" font-size="18" font-weight="700" fill="#f5f0e6">POLE</text>
-    <text x="196" y="36" font-family="Inter, sans-serif" font-size="11" fill="#f5f0e6">1 VER</text>
-    <text x="196" y="52" font-family="Inter, sans-serif" font-size="11" fill="#f5f0e6">2 RUS</text>
-    <text x="196" y="68" font-family="Inter, sans-serif" font-size="11" fill="#f5f0e6">3 NOR</text>
-  `),
-};
-
-function artFor(name) {
-  return ART[name] || ART.cop;
+let briefFont = 8;
+while (briefFont >= 7 && news.briefColumns.some((col) => columnHeight(col, briefFont) > briefAreaH - 1)) {
+  briefFont -= 0.25;
 }
-
-function ring(points) {
-  return points.map(([lon, lat], i) => {
-    const x = (lon + 180).toFixed(1);
-    const y = (90 - lat).toFixed(1);
-    return `${i === 0 ? 'M' : 'L'}${x} ${y}`;
-  }).join(' ') + ' Z';
+if (briefFont < 7) {
+  for (const col of news.briefColumns) {
+    console.error(col.join("+"), columnHeight(col, 7).toFixed(1), ">", briefAreaH);
+  }
+  fail("briefs do not fit above DATE CHECK");
 }
+const briefLineH = briefFont + 1.9;
 
 const LAND = [
-  [[-168, 71], [-156, 71], [-141, 70], [-130, 54], [-124, 48], [-124, 40], [-117, 32], [-110, 24], [-105, 21], [-97, 16], [-87, 21], [-81, 25], [-80, 31], [-76, 35], [-74, 40], [-70, 41], [-66, 45], [-70, 47], [-56, 52], [-64, 60], [-78, 62], [-88, 64], [-94, 68], [-110, 73], [-128, 71], [-140, 70], [-156, 71], [-166, 65], [-168, 71]],
-  [[-73, 78], [-60, 83], [-42, 83], [-22, 81], [-20, 73], [-32, 68], [-44, 60], [-52, 66], [-68, 76], [-73, 78]],
-  [[-80, 9], [-77, 8], [-75, -5], [-70, -18], [-71, -28], [-73, -38], [-72, -50], [-68, -55], [-65, -52], [-58, -38], [-48, -28], [-39, -16], [-35, -5], [-40, -2], [-50, 0], [-60, 8], [-70, 12], [-77, 7]],
-  [[-10, 36], [-9, 43], [-8, 44], [0, 43], [3, 50], [-2, 49], [-5, 50], [-5, 54], [-2, 59], [5, 59], [8, 56], [10, 54], [12, 56], [14, 55], [12, 46], [16, 40], [19, 40], [28, 41], [29, 45], [40, 47], [32, 56], [29, 60], [24, 65], [12, 66], [5, 62], [-6, 62], [-5, 58], [-8, 54], [-10, 52]],
-  [[-10, 52], [-8, 55], [-6, 55], [-6, 52], [-9, 51], [-10, 52]],
-  [[-6, 58], [-5, 59], [-3, 59], [-2, 58], [-4, 50], [-5, 50], [-5, 54], [-6, 56]],
-  [[-17, 21], [-16, 15], [-8, 5], [-10, 4], [9, 4], [10, 2], [14, -12], [12, -18], [14, -22], [18, -34], [20, -35], [26, -34], [32, -29], [35, -20], [34, -10], [40, -15], [42, -12], [51, 12], [43, 12], [39, 15], [43, 15], [32, 31], [25, 32], [10, 37], [-2, 36], [-6, 35], [-10, 32], [-17, 21]],
-  [[32, 31], [35, 33], [36, 36], [40, 37], [44, 37], [48, 30], [50, 27], [56, 27], [58, 25], [55, 22], [52, 16], [44, 12], [43, 15], [36, 22], [35, 28]],
-  [[43, -12], [50, -15], [47, -25], [44, -25], [43, -16]],
-  [[60, 25], [68, 24], [72, 22], [70, 20], [66, 23], [62, 25]],
-  [[68, 24], [73, 19], [88, 22], [92, 24], [88, 28], [80, 26], [70, 22]],
-  [[40, 40], [48, 42], [60, 45], [70, 45], [80, 50], [90, 50], [100, 52], [120, 54], [140, 58], [160, 66], [180, 68], [190, 66], [180, 64], [160, 60], [140, 52], [130, 42], [120, 38], [110, 20], [108, 14], [104, 2], [100, 8], [98, 16], [80, 16], [78, 8], [73, 8], [68, 22], [60, 25], [50, 26], [44, 12], [42, 16], [36, 22], [34, 30], [36, 36], [40, 40]],
-  [[100, 8], [104, 2], [108, 1], [109, 8], [104, 12], [100, 12]],
-  [[95, 6], [98, 4], [104, -2], [105, -6], [100, -4], [96, 1]],
-  [[105, -6], [114, -8], [114, -7], [108, -6]],
-  [[109, 2], [117, 7], [119, 5], [116, -3], [109, 1]],
-  [[120, 18], [122, 18], [126, 8], [125, 6], [122, 10], [120, 14]],
-  [[131, -1], [141, -2], [150, -10], [147, -6], [141, -8], [132, -4]],
-  [[130, 31], [131, 34], [136, 35], [140, 35], [141, 41], [145, 43], [141, 45], [139, 42], [138, 36], [134, 33], [131, 31]],
-  [[113, -22], [122, -16], [130, -13], [136, -12], [142, -11], [146, -16], [150, -23], [153, -28], [153, -33], [150, -37], [145, -39], [137, -36], [128, -32], [124, -33], [115, -34], [114, -28], [113, -24]],
-  [[166, -46], [168, -47], [171, -44], [174, -41], [172, -40], [168, -43]],
-  [[173, -41], [175, -37], [178, -37], [178, -39], [175, -41]],
+  [[-168, 71], [-164, 67], [-166, 63], [-160, 61], [-153, 59], [-146, 60], [-140, 59], [-136, 57], [-130, 54], [-126, 49], [-124, 45], [-124, 40], [-122, 36], [-117, 32.5], [-114, 31], [-110, 24], [-105, 21], [-97, 16], [-91, 14], [-87, 13], [-83, 8.5], [-79, 8], [-81, 9], [-87, 13.5], [-91, 17], [-97, 20], [-97, 26], [-97, 28.5], [-93, 29.5], [-90, 29], [-88, 30.5], [-84, 30], [-82, 26], [-80, 25], [-81, 31], [-77, 34], [-75, 35.5], [-74, 39], [-72, 41], [-70, 42], [-67, 44.5], [-67, 47], [-60, 47], [-64, 50], [-56, 52], [-62, 58], [-64, 60], [-72, 62], [-80, 63], [-88, 64], [-96, 66], [-108, 69], [-128, 70], [-140, 70], [-156, 71], [-166, 72], [-168, 71]],
+  [[-73, 77.5], [-60, 76], [-48, 70], [-43, 66], [-44, 60.5], [-52, 64], [-62, 68], [-70, 74], [-73, 77.5]],
+  [[-77, 8], [-71, 12], [-67, 11], [-62, 8.5], [-60, 6], [-54, 2], [-50, 0], [-45, -2], [-38, -5], [-35, -7], [-35, -10], [-39, -16], [-40, -20], [-43, -23], [-48, -28], [-50, -31], [-53, -34], [-58, -38], [-62, -40], [-65, -43], [-68, -47], [-71, -52], [-74, -52], [-73, -46], [-71, -38], [-72, -30], [-71, -18], [-75, -14], [-77, -12], [-79, -6], [-80, -2], [-78, 1], [-78, 6], [-77, 8]],
+  [[-9.5, 37], [-8.9, 40], [-8.8, 43.4], [-4, 43.5], [-1.6, 46], [-4.6, 48], [-1.8, 49.4], [1.6, 51], [4.4, 52.4], [8, 55.5], [10.4, 57.6], [12, 56], [11.4, 59], [12.4, 62], [15, 66], [18, 69.2], [25, 71], [32, 70], [44, 68], [60, 69.5], [80, 73], [104, 76], [130, 73], [156, 70], [170, 66], [178, 66], [170, 63], [162, 60], [156, 52], [142, 46], [132, 43], [128, 35], [122, 37], [121, 31], [120, 26], [114, 22.5], [109, 20], [109, 13], [106, 10], [104, 1.5], [100, 7], [98, 13], [92, 20], [88, 22], [80, 16], [77.4, 8], [76, 10], [73, 15], [72.6, 21], [69, 23.5], [66, 25], [62, 25], [57, 26.5], [58, 24], [57, 22], [52, 16], [44, 12.6], [43, 16], [39, 22], [35, 28], [34.5, 31.2], [32, 31.4], [36, 36.2], [29, 36.4], [26, 36.6], [23, 38], [20, 39.6], [18, 40.4], [15.2, 38], [12.4, 42], [10, 44], [7.5, 43.6], [3, 42.6], [-0.4, 42.8], [-5.4, 36.2], [-9.5, 37]],
+  [[-5.4, 50], [-5.2, 52], [-3.2, 54.5], [-2, 56], [-3.2, 58.5], [-5, 58.4], [-6.2, 56.5], [-5.2, 54.6], [-4.6, 52.6], [-5.3, 50.2], [-4, 50.2], [-5.4, 50]],
+  [[-10.2, 51.8], [-9.6, 53.4], [-8.2, 54.6], [-6.2, 55.2], [-6, 54], [-8, 52.6], [-9.6, 51.6], [-10.2, 51.8]],
+  [[-17, 21], [-16, 26], [-10, 32], [-6, 35.5], [-2, 35.5], [8, 37], [10, 33], [11, 30], [25, 32], [32, 31], [34, 28], [43, 12.2], [51, 12], [51, 10], [44, 2], [41, -2], [42, -10], [39, -15], [35, -20], [32, -26], [28, -33], [20, -34.8], [18, -32], [14, -22], [12, -6], [9, 4], [10, 6], [-5, 5], [-8, 4], [-16, 12], [-17, 15], [-16, 21], [-17, 21]],
+  [[43.2, -12], [50.2, -15], [47.4, -25.4], [43.6, -25], [43.2, -16], [43.2, -12]],
+  [[129, 34], [132, 34], [136, 35], [140, 35.5], [141, 38], [141, 41], [145, 43.5], [141, 45], [140, 42], [139, 38], [136, 36], [132, 34], [130, 32], [131, 34], [129, 34]],
+  [[124, 12], [126, 14], [126, 18], [122, 18], [120, 14], [120, 8], [122, 6], [125.5, 6.2], [126.4, 8], [124, 12]],
+  [[95, 5.5], [102, 2], [108, -1], [114, -3], [119, -4], [122, -8], [114, -8.5], [106, -6], [102, -2], [95, 2], [95, 5.5]],
+  [[108.5, 1.5], [114, 1], [119, 5], [117, 7], [111, 2], [108.5, 1.5]],
+  [[131, -1], [141, -2], [147, -6], [146, -10], [141, -8], [134, -8], [131, -3], [131, -1]],
+  [[113, -22], [114, -28], [115, -34], [122, -34], [130, -32], [136, -35], [141, -38], [147, -38], [150, -37], [153.5, -27], [146, -18], [143, -11], [136, -12], [128, -14], [124, -16], [114, -21], [113, -22]],
+  [[166, -46], [170, -46], [174, -41], [178, -37], [175, -39], [172, -41], [167, -46]],
+  [[80, 9.5], [81.8, 8], [81.6, 6], [80, 6], [79.6, 8], [80, 9.5]],
 ];
 
-const PINS = {
-  1: [30.7, 36.9],
-  2: [46.7, 24.7],
-  3: [-76.1, -11.0],
-  4: [21.0, 52.2],
-  5: [30.5, 50.4],
-  6: [30.3, 50.5],
-  7: [6.1, 46.2],
-  8: [4.4, 50.8],
-  9: [2.3, 48.9],
-  10: [34.5, 31.5],
-  11: [56.3, 26.6],
-  12: [56.6, 26.3],
-  13: [125.6, 7.1],
-  14: [174.8, -41.3],
-  15: [145.0, -37.8],
-  16: [140.1, 37.7],
-  17: [135.5, 34.7],
-  18: [127.3, 36.5],
-  19: [129.3, 35.5],
-  20: [126.9, 37.6],
-  21: [130.4, 33.6],
-  22: [139.7, 35.7],
-  23: [127.0, 37.5],
-  24: [127.1, 37.6],
-  25: [94.0, 24.3],
-  26: [90.3, 23.9],
-  27: [74.3, 31.5],
-  28: [77.2, 28.6],
-  29: [36.8, -1.3],
-  30: [7.5, 9.1],
-  31: [28.0, -26.2],
-  32: [31.3, -26.5],
-  34: [-115.1, 36.2],
-  35: [-80.7, 28.4],
-  36: [-58.4, -34.6],
-  39: [134.0, -25.0],
-  40: [153.4, -28.0],
-  41: [145.6, -35.8],
-  42: [151.2, -33.9],
-  43: [139.8, 35.7],
-  44: [139.6, 35.6],
-  45: [139.9, 36.6],
-  47: [7.7, 45.1],
-  48: [-1.5, 52.5],
-  49: [-0.3, 51.5],
-};
+function landPath() {
+  return LAND.map((ring) => ring.map(([lon, lat], i) => {
+    const [x, y] = project(lon, lat);
+    return `${i ? "L" : "M"}${x.toFixed(1)} ${y.toFixed(1)}`;
+  }).join("") + "Z").join("");
+}
 
-function worldMap() {
-  const byId = new Map(allStories().map((s) => [s.n, s]));
-  const land = LAND.map((pts) => `<path d="${ring(pts)}"/>`).join('');
-  const placed = [];
-  const marks = Object.entries(PINS).map(([id, [lon, lat]]) => {
-    const story = byId.get(Number(id));
-    const colour = COLOUR[story.region];
-    const x = lon + 180;
-    let y = 90 - lat;
-    let guard = 0;
-    while (placed.some((p) => Math.hypot(p.x - x, p.y - y) < 5.5) && guard < 6) {
-      y -= 3.2;
-      guard += 1;
+function clusterPins(pins, radius) {
+  const parent = pins.map((_, i) => i);
+  const find = (i) => (parent[i] === i ? i : (parent[i] = find(parent[i])));
+  for (let i = 0; i < pins.length; i++) {
+    for (let j = i + 1; j < pins.length; j++) {
+      const dx = pins[i].x - pins[j].x;
+      const dy = pins[i].y - pins[j].y;
+      if (dx * dx + dy * dy <= radius * radius) parent[find(i)] = find(j);
     }
-    placed.push({ x, y });
-    return `<g><circle cx="${x.toFixed(1)}" cy="${(90 - lat).toFixed(1)}" r="1.3" fill="${colour}" stroke="#f5f0e6" stroke-width="0.35"/>
-      <text x="${(x + 1.5).toFixed(1)}" y="${(y - 0.4).toFixed(1)}" font-family="Inter, sans-serif" font-size="4.2" font-weight="700" fill="${colour}">${id}</text></g>`;
-  }).join('');
-  return `<svg viewBox="0 0 360 180" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-    <rect width="360" height="180" fill="#c5d9ea"/>
-    <g fill="#243e5c" stroke="#1b3148" stroke-width="0.4" stroke-linejoin="round">${land}</g>
-    ${marks}
+  }
+  const groups = new Map();
+  pins.forEach((p, i) => {
+    const k = find(i);
+    if (!groups.has(k)) groups.set(k, []);
+    groups.get(k).push(p);
+  });
+  return [...groups.values()];
+}
+
+function overlaps(a, b) {
+  return a.x < b.x + b.tw && a.x + a.tw > b.x && a.y > b.y - 9 && a.y - 9 < b.y;
+}
+
+function layoutLabels(groups) {
+  const placed = [];
+  const items = groups.map((g) => {
+    const cx = g.reduce((s, p) => s + p.x, 0) / g.length;
+    const cy = g.reduce((s, p) => s + p.y, 0) / g.length;
+    const ids = [...new Set(g.map((p) => p.id))].sort((a, b) => a - b);
+    const text = ids.join("·");
+    const size = text.length > 16 ? 6.1 : 7;
+    const tw = text.length * (size * 0.56) + 2;
+    return { cx, cy, text, tw, size };
+  }).sort((a, b) => b.tw - a.tw || a.cx - b.cx);
+  const dirs = [[1, 0], [-1, 0], [0, -1], [0, 1], [1, -1], [-1, -1], [1, 1], [-1, 1]];
+  for (const item of items) {
+    let best = null;
+    let bestScore = -1e9;
+    for (const [dx, dy] of dirs) {
+      for (const dist of [7, 12, 18, 26]) {
+        let x = item.cx + dx * dist;
+        let y = item.cy + dy * dist * 0.7;
+        if (dx < 0) x -= item.tw;
+        else if (dx === 0) x -= item.tw / 2;
+        x = Math.max(1, Math.min(mapW - item.tw - 1, x));
+        y = Math.max(8, Math.min(mapH - 2, y));
+        const box = { x, y, tw: item.tw };
+        let score = 50 - dist * 0.6;
+        for (const q of placed) if (overlaps(box, q)) score -= 90;
+        for (const p of pins) {
+          if (p.x >= x - 1 && p.x <= x + item.tw + 1 && p.y <= y + 1 && p.y >= y - 8) score -= 8;
+        }
+        if (score > bestScore) bestScore = score, best = { ...item, x, y };
+      }
+    }
+    placed.push(best);
+  }
+  return placed;
+}
+
+const pins = [];
+for (const s of news.stories) {
+  for (const p of s.pins || []) {
+    const [x, y] = project(p.lon, p.lat);
+    if (x < -2 || x > mapW + 2 || y < -2 || y > mapH + 2) fail(`pin ${s.id} falls outside the map`);
+    pins.push({ id: s.id, x, y, color: regionById.get(s.region).color, role: s.role });
+  }
+}
+const labels = layoutLabels(clusterPins(pins, 5));
+
+function mapSvg() {
+  const seas = [
+    [-40, 28, "ATLANTIC"],
+    [-28, -28, "ATLANTIC"],
+    [-150, 8, "PACIFIC"],
+    [-120, -30, "PACIFIC"],
+    [78, -20, "INDIAN"],
+  ];
+  const seaText = seas.map(([lon, lat, name]) => {
+    const [x, y] = project(lon, lat);
+    return `<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" text-anchor="middle" fill="#8FB0C2" font-family="Inter,sans-serif" font-size="7.5" font-weight="700" letter-spacing="0.14em">${name}</text>`;
+  }).join("");
+  const dots = pins.map((p) => {
+    const r = p.role === "lead" ? 4.2 : p.role === "mid" ? 3.3 : 2.5;
+    return `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${r}" fill="${p.color}" stroke="#F4EFE4" stroke-width="0.8"/>`;
+  }).join("");
+  const leaders = labels.map((lb) => {
+    const dx = lb.x + lb.tw / 2 - lb.cx;
+    const dy = lb.y - 4 - lb.cy;
+    if (Math.hypot(dx, dy) < 9) return "";
+    return `<line x1="${lb.cx.toFixed(1)}" y1="${lb.cy.toFixed(1)}" x2="${(lb.x + Math.min(8, lb.tw / 2)).toFixed(1)}" y2="${(lb.y - 3).toFixed(1)}" stroke="#1A140C" stroke-width="0.6" opacity="0.55"/>`;
+  }).join("");
+  const texts = labels.map((lb) => `<text x="${lb.x.toFixed(1)}" y="${lb.y.toFixed(1)}" fill="#1A140C" stroke="#F4EFE4" stroke-width="2.2" paint-order="stroke" font-family="Inter,sans-serif" font-size="${lb.size}" font-weight="700">${esc(lb.text)}</text>`).join("");
+  const graticule = [];
+  for (const lon of [-120, -60, 0, 60, 120]) {
+    const [x] = project(lon, 0);
+    graticule.push(`<line x1="${x.toFixed(1)}" y1="0" x2="${x.toFixed(1)}" y2="${mapH}" stroke="#C5D7E4" stroke-width="0.6"/>`);
+  }
+  for (const lat of [-40, 0, 40]) {
+    const [, y] = project(0, lat);
+    graticule.push(`<line x1="0" y1="${y.toFixed(1)}" x2="${mapW}" y2="${y.toFixed(1)}" stroke="#C5D7E4" stroke-width="0.6"/>`);
+  }
+  return `<svg viewBox="0 0 ${mapW} ${mapH}" width="${mapW}" height="${mapH}" xmlns="http://www.w3.org/2000/svg">
+    <rect width="${mapW}" height="${mapH}" fill="#D3E3EE"/>
+    ${graticule.join("")}
+    <path d="${landPath()}" fill="#1B3A4C" stroke="#0E2430" stroke-width="0.6" stroke-linejoin="round"/>
+    ${seaText}${dots}${leaders}${texts}
   </svg>`;
 }
 
-function counts() {
-  const tally = Object.fromEntries(REGIONS.map((name) => [name, 0]));
-  for (const story of allStories()) tally[story.region] += 1;
-  return REGIONS.map((name) => ({ name, n: tally[name], colour: COLOUR[name] }));
+function svg(w, h, body) {
+  return `<svg viewBox="0 0 ${w} ${h}" width="100%" height="${h}" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">${body}</svg>`;
 }
 
-function css() {
-  return `
-    * { box-sizing: border-box; }
-    html, body { margin: 0; width: 1024px; height: 1024px; background: ${PAPER}; color: ${INK}; }
-    .sheet {
-      width: 1024px; height: 1024px; padding: 16px 16px 10px; background: ${PAPER};
-      display: grid; row-gap: 1px;
-      grid-template-rows: 16px 66px 20px 24px 16px 254px 248px 231px 100px 14px;
-      font-family: Inter, "Source Sans 3", "Source Sans Pro", Roboto, sans-serif;
-    }
-    .mast { display: flex; align-items: flex-end; justify-content: space-between; border-top: 3px solid ${INK}; }
-    .mast b, .mast span { font-size: 11px; letter-spacing: 0.06em; line-height: 13px; }
-    h1 {
-      margin: 0; text-align: center; align-self: center;
-      font-family: "Playfair Display", "Source Serif Pro", Georgia, serif;
-      font-weight: 700; font-size: 64px; line-height: 66px; letter-spacing: -0.02em; white-space: nowrap;
-    }
-    .kpis, .regions { display: grid; gap: 4px; }
-    .kpis { grid-template-columns: repeat(8, 1fr); }
-    .kpi, .seg { border: 1px solid ${INK}; background: #fbf7f0; min-width: 0; display: flex; align-items: center; justify-content: space-between; padding: 0 4px; }
-    .kpi b, .seg b { font-size: 11px; line-height: 12px; text-align: right; }
-    .kpi span, .seg span { font-size: 8px; letter-spacing: 0.03em; line-height: 10px; }
-    .ticks { display: grid; grid-template-columns: repeat(9, 1fr); align-items: end; border-bottom: 2px solid ${INK}; padding-bottom: 1px; }
-    .ticks div { text-align: center; font-size: 8px; line-height: 10px; font-weight: 700; }
-    .ticks i { display: block; font-style: normal; font-weight: 500; }
-    .ticks .eu { text-align: right; padding-right: 8px; }
-    .ticks .pl { text-align: right; }
-    .regions { grid-template-columns: repeat(8, 1fr); }
-    .seg { border-top: 3px solid var(--c); }
-    .leads, .cards { display: grid; min-height: 0; gap: 6px; }
-    .leads { grid-template-columns: repeat(4, 1fr); }
-    .cards { grid-template-columns: repeat(5, 1fr); grid-template-rows: 1fr 1fr; gap: 4px; }
-    .lead, .card { border: 1.5px solid ${INK}; background: #fbf7f0; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
-    .art { flex: none; background: #e7e1d4; }
-    .lead .art { height: 142px; }
-    .card .art { height: 56px; }
-    .card .body { padding: 1px 5px 0; }
-    .art svg { width: 100%; height: 100%; display: block; }
-    .body { padding: 2px 5px 1px; min-height: 0; display: flex; flex-direction: column; }
-    .tag { font-size: 8px; font-weight: 750; letter-spacing: 0.03em; line-height: 9px; text-align: left; }
-    .num { display: inline-block; min-width: 14px; background: ${INK}; color: ${PAPER}; text-align: center; font-size: 8px; letter-spacing: 0; }
-    h2, h3 { margin: 0; text-align: left; font-family: "Playfair Display", "Source Serif Pro", Georgia, serif; font-weight: 700; }
-    .lead h2 { font-size: 18px; line-height: 1.02; }
-    .card h3 { font-size: 12px; line-height: 1.05; }
-    p { margin: 1px 0 0; text-align: left; font-size: 10px; line-height: 1.15; }
-    .card p { font-size: 9px; line-height: 1.15; }
-    cite { margin: 1px 0 0; font-style: normal; font-size: 8px; font-weight: 700; line-height: 10px; text-align: left; }
-    .sure { font-weight: 800; letter-spacing: 0.03em; }
-    .split { display: grid; grid-template-columns: 336px 1fr; gap: 6px; min-height: 0; }
-    .panel { border: 1.5px solid ${INK}; background: #fbf7f0; min-height: 0; padding: 2px 4px 4px; display: flex; flex-direction: column; overflow: hidden; }
-    .panel h2 { margin: 0; font-family: Inter, sans-serif; font-size: 11px; letter-spacing: 0.06em; text-align: left; line-height: 13px; }
-    .map { flex: 1; min-height: 0; background: #c5d9ea; }
-    .map svg { width: 100%; height: 100%; display: block; }
-    .note { margin: 1px 0 0; font-size: 8px; line-height: 10px; text-align: left; white-space: nowrap; }
-    .cols { flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; align-content: start; }
-    .cols h3 { margin: 1px 0 0; font-family: Inter, sans-serif; font-size: 8px; letter-spacing: 0.05em; line-height: 10px; text-align: left; color: var(--c); }
-    .brief { margin: 0; font-size: 7.5px; line-height: 9px; text-align: left; }
-    .mark { font-weight: 800; letter-spacing: 0.02em; }
-    .OFF { color: #1a4a7a; }
-    .CONF { color: #1b6b38; }
-    .REP { color: #8a5a12; }
-    .CLAIM { color: #9e1b28; }
-    .datecheck { border: 2px solid ${RED}; padding: 3px 6px 2px; background: ${PAPER}; }
-    .datecheck strong { display: block; color: ${RED}; font-size: 11px; letter-spacing: 0.12em; line-height: 13px; text-align: left; }
-    .datecheck p { margin: 1px 0 0; font-size: 9px; line-height: 1.22; }
-    .datecheck .yet { font-weight: 800; }
-    footer { display: flex; align-items: center; justify-content: center; text-align: center; font-size: 8.5px; font-weight: 650; line-height: 11px; }
-  `;
+function cop31() {
+  return svg(242, 142, `
+    <rect width="242" height="142" fill="#E6EDF5"/>
+    <rect x="14" y="16" width="104" height="112" fill="#FFFCF7" stroke="#1A140C" stroke-width="1.5"/>
+    <rect x="26" y="30" width="78" height="8" fill="#1F4E89"/>
+    <rect x="26" y="48" width="72" height="4" fill="#D0C8BA"/>
+    <rect x="26" y="58" width="64" height="4" fill="#D0C8BA"/>
+    <rect x="26" y="68" width="76" height="4" fill="#D0C8BA"/>
+    <rect x="26" y="84" width="50" height="4" fill="#D0C8BA"/>
+    <text x="26" y="114" font-family="Inter,sans-serif" font-size="14" font-weight="700" fill="#8E1C1C">3RD DRAFT</text>
+    <circle cx="178" cy="50" r="34" fill="#FFFCF7" stroke="#1A140C" stroke-width="2"/>
+    <circle cx="178" cy="50" r="2.6" fill="#1A140C"/>
+    <line x1="178" y1="50" x2="178" y2="26" stroke="#1A140C" stroke-width="2.2"/>
+    <line x1="178" y1="50" x2="200" y2="60" stroke="#8E1C1C" stroke-width="2.2"/>
+    <path d="M152 28 A34 34 0 0 1 204 28" fill="none" stroke="#8E1C1C" stroke-width="3"/>
+    <rect x="148" y="112" width="14" height="16" fill="#1F4E89"/>
+    <rect x="166" y="100" width="14" height="28" fill="#1F4E89"/>
+    <rect x="184" y="118" width="14" height="10" fill="#C4511A"/>
+    <rect x="202" y="106" width="14" height="22" fill="#1F4E89"/>
+    <line x1="144" y1="128" x2="220" y2="128" stroke="#1A140C" stroke-width="1.5"/>`);
 }
 
-function leadHtml(story) {
-  return `<article class="lead">
-    <div class="art">${artFor(story.motif)}</div>
-    <div class="body">
-      <div class="tag"><span class="num">${story.n}</span> ${esc(story.place)} · ${esc(story.topic)}</div>
-      <h2>${esc(story.headline)}</h2>
-      <p>${esc(story.detail)}</p>
-      <cite>${esc(story.source)} · <span class="sure">${esc(story.tag)}</span></cite>
-    </div>
+function riyadh() {
+  const stars = [[18, 14], [42, 26], [68, 12], [108, 20], [206, 16], [224, 34], [154, 10]]
+    .map(([x, y]) => `<circle cx="${x}" cy="${y}" r="1.15" fill="#F4EFE4"/>`).join("");
+  return svg(242, 142, `
+    <rect width="242" height="142" fill="#0E1C33"/>
+    ${stars}
+    <rect y="108" width="242" height="34" fill="#071018"/>
+    <rect x="12" y="82" width="16" height="60" fill="#16324C"/>
+    <rect x="34" y="68" width="28" height="74" fill="#1A3C5C"/>
+    <rect x="68" y="90" width="14" height="52" fill="#12283E"/>
+    <rect x="90" y="58" width="36" height="84" fill="#1E4668"/>
+    <rect x="132" y="86" width="18" height="56" fill="#16324C"/>
+    <rect x="156" y="96" width="34" height="46" fill="#12283E"/>
+    <rect x="198" y="76" width="24" height="66" fill="#1A3C5C"/>
+    <line x1="22" y1="8" x2="60" y2="48" stroke="#F3D48A" stroke-width="2"/>
+    <circle cx="64" cy="52" r="7" fill="none" stroke="#E24B3A" stroke-width="2"/>
+    <line x1="78" y1="6" x2="116" y2="48" stroke="#F3D48A" stroke-width="2"/>
+    <circle cx="120" cy="52" r="7" fill="none" stroke="#E24B3A" stroke-width="2"/>
+    <line x1="138" y1="12" x2="176" y2="46" stroke="#F3D48A" stroke-width="2"/>
+    <circle cx="180" cy="50" r="7" fill="none" stroke="#E24B3A" stroke-width="2"/>
+    <polygon points="204,94 222,98 204,102 211,98" fill="#D5DEE8"/>
+    <line x1="214" y1="88" x2="224" y2="106" stroke="#E24B3A" stroke-width="1.6"/>`);
+}
+
+function quake() {
+  return svg(242, 142, `
+    <rect width="242" height="142" fill="#F3E6CF"/>
+    <polygon points="0,98 46,44 88,94 126,36 170,100 208,56 242,92 242,142 0,142" fill="#8C5A3C"/>
+    <polygon points="0,114 58,72 110,116 152,68 198,120 242,88 242,142 0,142" fill="#6B3F2A"/>
+    <polyline points="8,124 32,124 42,102 54,138 66,112 78,124 108,124 120,96 132,140 146,110 160,124 188,124 200,106 214,130 226,116 236,124" fill="none" stroke="#FFFCF7" stroke-width="2.3"/>
+    <circle cx="126" cy="70" r="9" fill="none" stroke="#8E1C1C" stroke-width="2"/>
+    <circle cx="126" cy="70" r="2.5" fill="#8E1C1C"/>`);
+}
+
+function warsaw() {
+  return svg(242, 142, `
+    <rect width="242" height="142" fill="#F7F1E6"/>
+    <rect width="88" height="71" fill="#FFFFFF"/>
+    <rect y="71" width="88" height="71" fill="#DC143C"/>
+    <circle cx="44" cy="36" r="16" fill="none" stroke="#1F4E89" stroke-width="2"/>
+    <polygon points="44,22 47,36 44,50 41,36" fill="#1F4E89"/>
+    <polygon points="28,36 44,33 60,36 44,39" fill="#1F4E89"/>
+    <rect x="110" y="52" width="114" height="76" fill="#E7E0D4" stroke="#1A140C" stroke-width="1.5"/>
+    <polygon points="102,52 167,16 232,52" fill="#1F4E89"/>
+    <rect x="154" y="86" width="26" height="42" fill="#1F4E89"/>
+    <rect x="124" y="66" width="16" height="14" fill="#FFFCF7" stroke="#1A140C"/>
+    <rect x="148" y="66" width="16" height="14" fill="#FFFCF7" stroke="#1A140C"/>
+    <rect x="186" y="66" width="16" height="14" fill="#FFFCF7" stroke="#1A140C"/>
+    <rect x="208" y="66" width="14" height="14" fill="#FFFCF7" stroke="#1A140C"/>`);
+}
+
+function midArt(id) {
+  const w = 192;
+  const h = 56;
+  const common = {
+    5: `<rect width="192" height="56" fill="#0E1C33"/>
+      <path d="M14 40 l10 -6 l8 6 l-8 4 z M40 28 l10 -6 l8 6 l-8 4 z M66 38 l10 -6 l8 6 l-8 4 z M34 16 l22 8 M70 14 l24 10 M96 18 l18 8" fill="#D5DEE8" stroke="#F3D48A" stroke-width="1.2"/>
+      <text x="168" y="38" text-anchor="end" fill="#F4EFE4" font-family="Playfair Display,serif" font-size="26" font-weight="700">148</text>`,
+    8: `<rect width="192" height="56" fill="#E7EEF6"/>
+      <rect x="16" y="18" width="16" height="28" fill="#1F4E89"/><rect x="36" y="10" width="16" height="36" fill="#1F4E89"/><rect x="56" y="22" width="16" height="24" fill="#1F4E89"/>
+      <circle cx="112" cy="28" r="16" fill="#FFFCF7" stroke="#1F4E89" stroke-width="2"/>
+      <text x="112" y="34" text-anchor="middle" fill="#1F4E89" font-family="Inter,sans-serif" font-size="16" font-weight="700">€</text>
+      <rect x="140" y="30" width="14" height="16" fill="#8E1C1C"/><rect x="158" y="22" width="14" height="24" fill="#C4511A"/>
+      <path d="M142 18 l16 8" stroke="#8E1C1C" stroke-width="2"/>`,
+    7: `<rect width="192" height="56" fill="#F4EFE6"/>
+      <rect x="18" y="14" width="46" height="32" fill="#FFFCF7" stroke="#1A140C" stroke-width="1.3"/>
+      <path d="M28 24 h28 M28 32 h22 M28 40 h16" stroke="#C8BEB0" stroke-width="2"/>
+      <path d="M78 40 h28 l8 -22 h16" fill="none" stroke="#1A140C" stroke-width="3" stroke-linejoin="round"/>
+      <circle cx="132" cy="16" r="5" fill="#1A140C"/>
+      <text x="168" y="40" text-anchor="middle" fill="#8E1C1C" font-family="Inter,sans-serif" font-size="28" font-weight="800">X</text>`,
+    13: `<rect width="192" height="56" fill="#E5F1F7"/>
+      <path d="M16 34 h70 l16 -10 h28 l8 10 h18" fill="none" stroke="#1A140C" stroke-width="2"/>
+      <path d="M48 34 l18 -16 h22 l-8 16 z" fill="#1B3A4C"/>
+      <circle cx="46" cy="36" r="4" fill="#1A140C"/><circle cx="128" cy="36" r="4" fill="#1A140C"/>
+      <text x="178" y="26" text-anchor="end" fill="#1B3A4C" font-family="Playfair Display,serif" font-size="22" font-weight="700">146</text>`,
+    25: `<rect width="192" height="56" fill="#F8E4DC"/>
+      <rect x="28" y="10" width="22" height="34" rx="3" fill="#FFFCF7" stroke="#1A140C" stroke-width="1.4"/>
+      <rect x="32" y="16" width="14" height="16" fill="#C4511A"/>
+      <rect x="78" y="12" width="28" height="28" fill="#8E1C1C"/>
+      <rect x="89" y="16" width="6" height="20" fill="#FFFCF7"/><rect x="82" y="23" width="20" height="6" fill="#FFFCF7"/>
+      <text x="168" y="40" text-anchor="end" fill="#8E1C1C" font-family="Playfair Display,serif" font-size="28" font-weight="700">11</text>`,
+    26: `<rect width="192" height="56" fill="#F3EBDD"/>
+      <polygon points="16,34 40,16 64,34" fill="#1B3A4C"/><rect x="22" y="34" width="36" height="14" fill="#1B3A4C"/>
+      <polygon points="70,36 96,18 122,36" fill="#6E3A8A"/><rect x="78" y="36" width="36" height="12" fill="#6E3A8A"/>
+      <rect x="136" y="20" width="40" height="26" fill="#FFFCF7" stroke="#8E1C1C" stroke-width="2"/>
+      <line x1="136" y1="33" x2="176" y2="33" stroke="#8E1C1C" stroke-width="2"/>`,
+    14: `<rect width="192" height="56" fill="#E5F2E4"/>
+      <rect x="28" y="12" width="4" height="30" fill="#1A140C"/><rect x="40" y="8" width="4" height="34" fill="#1A140C"/><rect x="52" y="12" width="4" height="30" fill="#1A140C"/>
+      <rect x="24" y="40" width="36" height="4" fill="#C4511A"/>
+      <circle cx="96" cy="24" r="8" fill="#8E1C1C"/>
+      <text x="178" y="38" text-anchor="end" fill="#1F7A4D" font-family="Playfair Display,serif" font-size="22" font-weight="700">486-4</text>`,
+    46: `<rect width="192" height="56" fill="#071422"/>
+      <circle cx="46" cy="28" r="18" fill="#C47B45"/>
+      <circle cx="40" cy="24" r="4" fill="#A86434"/><circle cx="54" cy="32" r="3" fill="#A86434"/>
+      <path d="M78 36 q30 -28 70 -8" fill="none" stroke="#F3D48A" stroke-width="2"/>
+      <polygon points="148,22 168,28 148,34 154,28" fill="#F4EFE4"/>`,
+    49: `<rect width="192" height="56" fill="#E7F0E4"/>
+      <path d="M28 44 V14 M18 14 h20 M70 44 V14 M60 14 h20" stroke="#1A140C" stroke-width="3"/>
+      <ellipse cx="112" cy="30" rx="14" ry="9" fill="#F4EFE4" stroke="#1A140C" stroke-width="1.6" transform="rotate(-28 112 30)"/>
+      <text x="180" y="36" text-anchor="end" fill="#1F4E89" font-family="Playfair Display,serif" font-size="20" font-weight="700">37-12</text>`,
+    34: `<rect width="192" height="56" fill="#161616"/>
+      <path d="M16 34 h46 l10 -12 h28 l8 12 h36" fill="#F4EFE4"/>
+      <circle cx="36" cy="38" r="6" fill="#1A140C"/><circle cx="118" cy="38" r="6" fill="#1A140C"/>
+      <text x="176" y="24" text-anchor="end" fill="#F4EFE4" font-family="Inter,sans-serif" font-size="12" font-weight="800">POLE</text>
+      <text x="176" y="42" text-anchor="end" fill="#F3D48A" font-family="Inter,sans-serif" font-size="11" font-weight="700">1 VER</text>`,
+  };
+  return svg(w, h, common[id]);
+}
+
+const leadArt = { 1: cop31(), 2: riyadh(), 3: quake(), 4: warsaw() };
+const tagClass = (tag) => tag.toLowerCase();
+
+function card(story, x, y, w, h, artH) {
+  const color = regionById.get(story.region).color;
+  return `<article class="card" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px">
+    <div class="art" style="height:${artH}px">${story.role === "lead" ? leadArt[story.id] : midArt(story.id)}</div>
+    <div class="kick"><span class="badge" style="background:${color}">${story.id}</span><span>${esc(story.kicker)}</span></div>
+    <h2>${esc(story.headline)}</h2>
+    <p class="deck">${esc(story.deck)}</p>
+    <div class="src"><span>${esc(story.source)}</span><b class="tag ${tagClass(story.tag)}">${esc(story.tag)}</b></div>
   </article>`;
 }
 
-function cardHtml(story) {
-  return `<article class="card">
-    <div class="art">${artFor(story.motif)}</div>
-    <div class="body">
-      <div class="tag"><span class="num">${story.n}</span> ${esc(story.place)} · ${esc(story.topic)}</div>
-      <h3>${esc(story.headline)}</h3>
-      <p>${esc(story.detail)}</p>
-      <cite>${esc(story.source)} · <span class="sure">${esc(story.tag)}</span></cite>
-    </div>
-  </article>`;
+const leads = news.leadOrder.map((id, i) => card(byId.get(id), M + i * (leadW + leadG), yLead, leadW, hLead, 142));
+const mids = news.midOrder.map((id, i) => {
+  const col = i % 5;
+  const row = Math.floor(i / 5);
+  return card(byId.get(id), M + col * (midW + midG), yMid + row * (hMid + midGap), midW, hMid, 56);
+});
+
+function briefColumn(regionIds, x) {
+  const blocks = [];
+  for (const rid of regionIds) {
+    const region = regionById.get(rid);
+    const items = news.stories.filter((s) => s.role === "brief" && s.region === rid);
+    const rows = items.map((s) => `<p class="brief"><b class="bn" style="color:${region.color}">${s.id}</b> ${esc(s.line)} <span class="bs">${esc(s.source)}</span> <b class="tag ${tagClass(s.tag)}">${esc(s.tag)}</b></p>`).join("");
+    blocks.push(`<h3 style="color:${region.color}">${esc(region.name.toUpperCase())}</h3>${rows}`);
+  }
+  return `<div class="bcol" style="left:${x}px;width:${colW}px">${blocks.join("")}</div>`;
 }
 
-const SHORT = { OFFICIAL: 'OFF', CONFIRMED: 'CONF', REPORTED: 'REP', CLAIM: 'CLAIM' };
+const briefX0 = mapW + 8;
+const briefCols = news.briefColumns.map((ids, i) => briefColumn(ids, briefX0 + i * (colW + colG))).join("");
+const widths = segWidths();
+let segX = M;
+const segments = news.regions.map((r, i) => {
+  const w = widths[i];
+  const html = `<div class="seg" style="left:${segX}px;width:${w}px;background:${r.color}"><span>${esc(r.name)}</span><b>${r.count}</b></div>`;
+  segX += w;
+  return html;
+}).join("");
 
-function briefHtml(story) {
-  const tag = SHORT[story.tag] || story.tag;
-  return `<p class="brief"><b>${story.n}</b> ${esc(story.line)} ${esc(story.source)} <span class="mark ${tag}">${tag}</span></p>`;
-}
+const tickPad = 36;
+const tickXs = news.ticks.map((_, i) => M + tickPad + (i / (news.ticks.length - 1)) * (INNER - 2 * tickPad));
+const ticks = news.ticks.map((t, i) => `<div class="tick" style="left:${tickXs[i] - M}px"><b>${esc(t.time)}</b><span>${esc(t.place)}</span><i></i></div>`).join("");
 
-function columns() {
-  const groups = [
-    ['Europe', 'Middle East', 'Africa'],
-    ['East Asia'],
-    ['South Asia', 'Oceania', 'Americas', 'Global'],
-  ];
-  return groups.map((names) => {
-    const blocks = names.map((name) => {
-      const items = news.briefs.filter((s) => s.region === name).map(briefHtml).join('');
-      return `<h3 style="--c:${COLOUR[name]}">${name.toUpperCase()}</h3>${items}`;
-    }).join('');
-    return `<div>${blocks}</div>`;
-  }).join('');
-}
+const kpiGap = 4;
+const kpiW = (INNER - kpiGap * (news.kpis.length - 1)) / news.kpis.length;
+const kpis = news.kpis.map((k, i) => `<div class="kpi" style="left:${M + i * (kpiW + kpiGap)}px;width:${kpiW}px"><span>${esc(k.label)}</span><b>${esc(k.value)}</b></div>`).join("");
 
-function page() {
-  const chips = news.kpis.map((k) => `<div class="kpi"><span>${esc(k.label)}</span><b>${esc(k.value)}</b></div>`).join('');
-  const ticks = news.ticks.map((tick) => {
-    const cls = tick.label === 'EU budget' ? ' class="eu"' : tick.label === 'PL kick-off' ? ' class="pl"' : '';
-    return `<div${cls}>${esc(tick.t)}<i>${esc(tick.label)}</i></div>`;
-  }).join('');
-  const bar = counts().map((c) => `<div class="seg" style="--c:${c.colour}"><span>${esc(c.name)}</span><b>${c.n}</b></div>`).join('');
-  const box = news.dateCheck;
-  const leftOut = `${box.lead} ${box.items.join('; ')}.`;
-  return `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/>
-    <title>${esc(news.date)}</title><style>${css()}</style></head><body>
-    <main class="sheet">
-      <header class="mast"><b>${esc(news.kicker)}</b><span>${esc(news.countLine)}</span></header>
-      <h1>${esc(news.date)}</h1>
-      <section class="kpis">${chips}</section>
-      <section class="ticks">${ticks}</section>
-      <section class="regions">${bar}</section>
-      <section class="leads">${news.leads.map(leadHtml).join('')}</section>
-      <section class="cards">${news.features.map(cardHtml).join('')}</section>
-      <section class="split">
-        <div class="panel">
-          <h2>WHERE IT HAPPENED</h2>
-          <div class="map">${worldMap()}</div>
-          <p class="note">${esc(news.mapNote)} ${esc(news.footnote)}</p>
-        </div>
-        <div class="panel">
-          <h2>ALSO ON SATURDAY 21 NOVEMBER</h2>
-          <div class="cols">${columns()}</div>
-        </div>
-      </section>
-      <aside class="datecheck">
-        <strong>${esc(box.title)}</strong>
-        <p>${esc(leftOut)} <span class="yet">${esc(box.notYet)}</span></p>
-      </aside>
-      <footer>${esc(news.footer)}</footer>
-    </main></body></html>`;
-}
+const notes = news.mapNotes.map((line) => `<p>${esc(line)}</p>`).join("");
 
-function shoot(htmlPath, pngPath) {
-  const shot = spawnSync('google-chrome', [
-    '--headless=new', '--no-sandbox', '--disable-gpu', '--hide-scrollbars',
-    '--force-device-scale-factor=1', '--window-size=1024,1024',
-    `--screenshot=${pngPath}`, htmlPath,
-  ], { stdio: 'inherit', timeout: 60000 });
-  if (shot.status !== 0) throw new Error('chrome screenshot failed');
-}
+const css = `
+${fontCss}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1024px;height:1024px;overflow:hidden;background:#F4EFE4}
+.poster{position:relative;width:1024px;height:1024px;background:#F4EFE4;color:#1A140C;font-family:Inter,sans-serif}
+.kicker,.date,.band,.card,.lower,.dc,.foot,.kpi,.tick,.seg{position:absolute}
+.kicker{left:${M}px;top:${yKicker}px;width:${INNER}px;height:${hKicker}px;display:flex;justify-content:space-between;align-items:center;font-size:10px;font-weight:650;letter-spacing:.06em;color:#3A3228}
+.date{left:${M}px;top:${yDate}px;width:${INNER}px;height:${hDate}px;font-family:"Playfair Display","Source Serif Pro",serif;font-weight:700;font-size:44px;line-height:46px;letter-spacing:-.02em;color:#1A140C;white-space:nowrap}
+.kpi{top:${yKpi}px;height:${hKpi}px;background:#FFFCF8;border:1px solid #C9BBA6;display:flex;align-items:center;justify-content:space-between;padding:0 6px;font-size:8px;color:#4A433A}
+.kpi b{font-size:11px;font-weight:750;color:#1A140C;letter-spacing:-.02em}
+.utc{position:absolute;left:${M}px;top:${yUtc}px;width:${INNER}px;height:${hUtc}px}
+.tick{position:absolute;top:0;transform:translateX(-50%);text-align:center;white-space:nowrap;font-size:8px;line-height:10px;color:#1A140C}
+.tick b{display:block;font-weight:750}
+.tick span{display:block;color:#4A433A}
+.tick i{display:block;width:1px;height:6px;background:#1A140C;margin:1px auto 0}
+.utc .axis{position:absolute;left:0;right:0;bottom:0;height:1px;background:#1A140C}
+.region{position:absolute;left:0;top:${yRegion}px;width:${PAGE}px;height:${hRegion}px}
+.seg{top:0;height:${hRegion}px;display:flex;align-items:center;justify-content:space-between;padding:0 4px;color:#fff;font-size:8px;font-weight:650;white-space:nowrap}
+.seg b{font-weight:750}
+.card{background:#FFFCF8;border:1px solid #1C1915;overflow:hidden}
+.art{overflow:hidden}
+.art svg{display:block}
+.card .kick{position:static;display:flex;align-items:center;gap:4px;height:12px;margin:1px 6px 0;font-size:8px;font-weight:700;letter-spacing:.04em;color:#3A3228}
+.badge{display:inline-flex;align-items:center;justify-content:center;min-width:14px;height:12px;padding:0 2px;color:#fff;font-size:8px;font-weight:750}
+.card h2{font-family:"Playfair Display","Source Serif Pro",serif;font-weight:700;color:#1A140C;margin:0 6px;font-size:18px;line-height:18px;height:36px}
+.card .deck{margin:0 6px;color:#2A241C;font-family:"Source Serif Pro",serif;font-size:9px;line-height:10.5px;height:32px}
+.card .src{margin:0 6px;height:12px;display:flex;justify-content:space-between;align-items:baseline;gap:4px;font-size:7.5px;color:#4A433A;white-space:nowrap}
+.tag{font-weight:750;letter-spacing:.02em}
+.tag.official,.tag.off{color:#1F4E89}
+.tag.confirmed,.tag.conf{color:#1F7A4D}
+.tag.reported,.tag.rep{color:#8A5A12}
+.tag.claim{color:#9E1B1B}
 
-function flatten(src, dest) {
-  const py = `
-from PIL import Image
-im = Image.open(${JSON.stringify(src)}).convert("RGB")
-if im.size != (1024, 1024):
-    raise SystemExit("unexpected size %s" % (im.size,))
-im.save(${JSON.stringify(dest)}, format="PNG", optimize=True, compress_level=9)
-import os
-if os.path.getsize(${JSON.stringify(dest)}) > 1048576:
-    q = im.quantize(colors=128, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.NONE)
-    q.save(${JSON.stringify(dest)}, format="PNG", optimize=True, compress_level=9)
+.lower{left:${M}px;top:${yLower}px;width:${INNER}px;height:${lowerH}px;background:#FBF7F0;border:1px solid #1C1915}
+.lower h2,.ahead{position:absolute;top:2px;height:14px;font-family:Inter,sans-serif;font-size:9px;font-weight:750;letter-spacing:.08em;color:#1A140C}
+.mapbox{position:absolute;left:4px;top:16px;width:${mapW}px;height:${mapH}px}
+.notes{position:absolute;left:6px;top:${18 + mapH}px;width:${mapW - 4}px;font-size:8px;line-height:10.5px;color:#2A241C}
+.notes p{margin:0 0 3px}
+.bcol{position:absolute;top:16px;height:${briefAreaH}px}
+.bcol h3{font-size:8px;font-weight:750;letter-spacing:.06em;border-bottom:1px solid currentColor;margin:2px 0 1px;line-height:11px;height:12px}
+.brief{font-size:${briefFont}px;line-height:${briefLineH}px;color:#1A140C}
+.bn{font-weight:750;margin-right:2px}
+.bs{color:#4A433A}
+.dc{left:${M}px;top:${dcY}px;width:${INNER}px;height:${dcH}px;border:1.5px solid #8E1C1C;background:#FBF3F1}
+.dc-title{height:${dcTitleH}px;background:#8E1C1C;color:#fff;font-family:Inter,sans-serif;font-size:14px;font-weight:800;letter-spacing:.12em;line-height:${dcTitleH}px;padding:0 8px}
+.dc p{padding:${dcPad}px 8px 0;font-size:${dcFont}px;line-height:${dcLineH}px;color:#2A1212}
+.dc strong{font-weight:750}
+.foot{left:${M}px;top:${yFooter}px;width:${INNER}px;height:${hFooter}px;font-size:7.5px;line-height:${hFooter}px;color:#3A3228;white-space:nowrap;overflow:hidden}
 `;
-  const run = spawnSync('python3', ['-c', py], { stdio: 'inherit' });
-  if (run.status !== 0) throw new Error('png flatten failed');
-}
 
-function main() {
-  validate();
-  mkdirSync(here, { recursive: true });
-  const htmlPath = join(here, 'poster.html');
-  const shotPath = '/tmp/sat-49-shot.png';
-  writeFileSync(htmlPath, page());
-  shoot(htmlPath, shotPath);
-  flatten(shotPath, join(root, 'entry.png'));
-  unlinkSync(shotPath);
-  const check = spawnSync(process.execPath, [join(here, 'check.mjs')], { stdio: 'inherit' });
-  if (check.status !== 0) process.exit(check.status ?? 1);
-}
+const midCss = `
+.mids h2{font-size:12px;line-height:12px;height:12px}
+.mids .deck{font-family:Inter,sans-serif;font-style:normal;font-size:8px;line-height:9px;height:18px}
+.mids .kick{height:10px;margin-top:0}
+.mids .src{height:10px}
+`;
 
-main();
+const html = `<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>Saturday 21 November 2026</title>
+<style>${css}${midCss}</style></head>
+<body><div class="poster">
+  <div class="kicker"><span>THE WORLD IN ONE DAY</span><span>${esc(news.masthead.countLine)}</span></div>
+  <div class="date">${esc(news.masthead.date)}</div>
+  ${kpis}
+  <div class="utc">${ticks}<div class="axis"></div></div>
+  <div class="region">${segments}</div>
+  ${leads.join("")}
+  <div class="mids">${mids.join("")}</div>
+  <section class="lower">
+    <h2 class="ahead" style="left:4px">WHERE IT HAPPENED</h2>
+    <h2 class="ahead" style="left:${mapW + 12}px">ALSO ON SATURDAY 21 NOVEMBER</h2>
+    <div class="mapbox">${mapSvg()}</div>
+    <div class="notes">${notes}</div>
+    ${briefCols}
+  </section>
+  <section class="dc"><div class="dc-title">${esc(news.dateCheck.title)}</div><p>${esc(news.dateCheck.intro)} ${news.dateCheck.items.map((item) => esc(item)).join("; ")}. <strong>${esc(news.dateCheck.notYet)}</strong></p></section>
+  <div class="foot">${esc(news.footer)}</div>
+</div></body></html>`;
+
+const posterPath = join(here, "poster.html");
+const shotPath = join(here, "shot.png");
+const entryPath = join(root, "entry.png");
+const previewPath = join(here, "preview-300.png");
+await writeFile(posterPath, html);
+console.log(`layout lower=${lowerH} dc=${dcH.toFixed(1)}@${dcY.toFixed(1)} briefFont=${briefFont} lines=${dcLines}`);
+
+await execFileAsync("google-chrome", [
+  "--headless=new",
+  "--no-sandbox",
+  "--disable-gpu",
+  "--hide-scrollbars",
+  "--window-size=1024,1024",
+  `--screenshot=${shotPath}`,
+  `file://${posterPath}`,
+], { timeout: 90000, maxBuffer: 8 * 1024 * 1024 });
+
+const py = `
+from PIL import Image
+import os, sys
+im = Image.open(${JSON.stringify(shotPath)})
+print("shot", im.size, im.mode)
+if im.size != (1024, 1024):
+    sys.exit("screenshot is %s" % (im.size,))
+if im.mode == "RGBA":
+    bg = Image.new("RGB", im.size, (244, 239, 228))
+    bg.paste(im, mask=im.split()[-1])
+    im = bg
+else:
+    im = im.convert("RGB")
+im.save(${JSON.stringify(entryPath)}, "PNG", optimize=True)
+if os.path.getsize(${JSON.stringify(entryPath)}) > 1024 * 1024:
+    q = im.quantize(colors=192, method=Image.Quantize.MEDIANCUT).convert("RGB")
+    q.save(${JSON.stringify(entryPath)}, "PNG", optimize=True)
+    im = q
+im.resize((300, 300), Image.Resampling.LANCZOS).save(${JSON.stringify(previewPath)}, "PNG", optimize=True)
+print("entry", os.path.getsize(${JSON.stringify(entryPath)}))
+`;
+await execFileAsync("python3", ["-c", py], { timeout: 30000 });
+await rm(shotPath, { force: true });
+console.log("wrote", entryPath);

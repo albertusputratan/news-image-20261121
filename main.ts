@@ -1,8 +1,10 @@
-// Hands the Saturday 21 November 2026 sheet to the make.fun output folder.
-import * as disk from 'node:fs';
-import * as where from 'node:path';
+// Saturday 21 November 2026 — copy this folder's entry.png into the output dir.
+import { copyFile, mkdir } from "node:fs/promises";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 
-const sheetPath = where.join(import.meta.dirname, 'entry.png');
-const dropFolder = process.env.MAKEFUN_OUTPUT_DIR ?? '/output';
-disk.mkdirSync(dropFolder, { recursive: true });
-disk.copyFileSync(sheetPath, where.join(dropFolder, 'entry.png'));
+const scriptDir = dirname(fileURLToPath(import.meta.url));
+const outputDir = process.env.MAKEFUN_OUTPUT_DIR ?? "/output";
+
+await mkdir(outputDir, { recursive: true });
+await copyFile(join(scriptDir, "entry.png"), join(outputDir, "entry.png"));

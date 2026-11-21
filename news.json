@@ -1,261 +1,562 @@
 {
-  "kicker": "THE WORLD IN ONE DAY",
-  "countLine": "49 STORIES · 7 REGIONS · EVERY ONE FROM SATURDAY 21 NOVEMBER (ANY TIME ZONE)",
-  "date": "Saturday 21 November 2026",
-  "footnote": "* Saturday local time",
+  "masthead": {
+    "eyebrow": "THE WORLD IN ONE DAY",
+    "countLine": "49 STORIES · 7 REGIONS · EVERY ONE FROM SATURDAY 21 NOVEMBER 2026 (ANY TIME ZONE)",
+    "date": "Saturday 21 November 2026"
+  },
   "kpis": [
-    { "value": "Overtime", "label": "COP31" },
-    { "value": "3 missiles", "label": "coalition" },
-    { "value": "M6.7", "label": "Peru" },
-    { "value": "146 safe", "label": "PX19" },
-    { "value": "486-4", "label": "India" },
-    { "value": "€1.78tn", "label": "EU budget" },
-    { "value": "37-12", "label": "Twickenham" },
-    { "value": "~$58k", "label": "Bitcoin" }
+    {"label": "COP31", "value": "Overtime"},
+    {"label": "coalition", "value": "3 missiles"},
+    {"label": "Peru", "value": "M6.7"},
+    {"label": "PX19", "value": "146 safe"},
+    {"label": "India", "value": "486-4"},
+    {"label": "EU budget", "value": "€1.78tn"},
+    {"label": "Twickenham", "value": "37-12"},
+    {"label": "Bitcoin", "value": "~$58k"}
   ],
   "ticks": [
-    { "t": "22:53 Fri*", "label": "Riyadh" },
-    { "t": "00:09", "label": "Peru" },
-    { "t": "03:47", "label": "Kyiv" },
-    { "t": "04:00", "label": "Vegas" },
-    { "t": "05:00", "label": "Wellington" },
-    { "t": "09:15", "label": "Florida" },
-    { "t": "~12:30", "label": "EU budget" },
-    { "t": "12:30", "label": "PL kick-off" },
-    { "t": "18:24", "label": "Mercury" }
+    {"time": "22:53 Fri*", "place": "Riyadh"},
+    {"time": "00:09", "place": "Peru"},
+    {"time": "03:47", "place": "Kyiv"},
+    {"time": "04:00", "place": "Vegas"},
+    {"time": "05:00", "place": "Wellington"},
+    {"time": "09:15", "place": "Florida"},
+    {"time": "~12:30", "place": "EU budget"},
+    {"time": "12:30", "place": "PL kick-off"},
+    {"time": "18:24", "place": "Mercury"}
   ],
-  "leads": [
-    {
-      "n": 1,
-      "region": "Europe",
-      "place": "ANTALYA",
-      "topic": "CLIMATE",
-      "headline": "COP31 runs into Saturday overtime",
-      "detail": "Third draft due. Kurum: “We are close to the finish line, but we are not there yet.”",
-      "source": "AFP 21 Nov; BBC; AP",
-      "tag": "CONFIRMED",
-      "motif": "cop"
-    },
-    {
-      "n": 2,
-      "region": "Middle East",
-      "place": "RIYADH",
-      "topic": "MILITARY",
-      "headline": "Coalition: 3 missiles downed over Riyadh*",
-      "detail": "Coalition says three Houthi missiles were shot down over Riyadh, then a drone in the south.",
-      "source": "Arab News; Reuters; Al Jazeera",
-      "tag": "OFFICIAL",
-      "motif": "riyadh"
-    },
-    {
-      "n": 3,
-      "region": "Americas",
-      "place": "JUNIN",
-      "topic": "QUAKE",
-      "headline": "Peru M6.7, no deaths reported",
-      "detail": "00:09 UTC, 30 km NW of Junín, depth 129 km. Junín, Pasco, Huánuco, Lima damaged. One hurt.",
-      "source": "IGP; Indeci",
-      "tag": "OFFICIAL",
-      "motif": "quake"
-    },
-    {
-      "n": 4,
-      "region": "Europe",
-      "place": "WARSAW",
-      "topic": "NATO",
-      "headline": "Rutte: allies stand with Poland",
-      "detail": "“All allies stand in full solidarity with Poland.” Dangerous, he said. No Article 4.",
-      "source": "TVP World; PAP",
-      "tag": "CONFIRMED",
-      "motif": "nato"
-    }
+  "regions": [
+    {"id": "EUR", "name": "Europe", "count": 10, "color": "#1F4E89"},
+    {"id": "MEA", "name": "Middle East", "count": 4, "color": "#C4511A"},
+    {"id": "AFR", "name": "Africa", "count": 5, "color": "#1F7A4D"},
+    {"id": "SAS", "name": "South Asia", "count": 4, "color": "#6E3A8A"},
+    {"id": "EAS", "name": "East Asia", "count": 13, "color": "#B4333A"},
+    {"id": "OCE", "name": "Oceania", "count": 6, "color": "#0C7A86"},
+    {"id": "AME", "name": "Americas", "count": 5, "color": "#2C3E78"},
+    {"id": "GLB", "name": "Global", "count": 2, "color": "#5E564C"}
   ],
-  "features": [
-    {
-      "n": 5,
-      "region": "Europe",
-      "place": "UKRAINE",
-      "topic": "WAR",
-      "headline": "148 drones and 3 missiles",
-      "detail": "117 downed; hits at 19 places.",
-      "source": "RBC-Ukraine; KI",
-      "tag": "OFFICIAL",
-      "motif": "drones"
-    },
-    {
-      "n": 8,
-      "region": "Europe",
-      "place": "BRUSSELS",
-      "topic": "BUDGET",
-      "headline": "Costa’s €1.78tn EU budget",
-      "detail": "About 10% below the Commission plan.",
-      "source": "Euronews; dpa",
-      "tag": "OFFICIAL",
-      "motif": "budget"
-    },
-    {
-      "n": 7,
-      "region": "Europe",
-      "place": "GENEVA",
-      "topic": "ARMS",
-      "headline": "Killer-robot talks fail",
-      "detail": "No mandate; US and Russia resisted.",
-      "source": "Reuters; Al Jazeera",
-      "tag": "CONFIRMED",
-      "motif": "robots"
-    },
-    {
-      "n": 13,
-      "region": "East Asia",
-      "place": "DAVAO",
-      "topic": "AVIATION",
-      "headline": "PX19: all 146 safe",
-      "detail": "767 fire warning; evacuated in Davao.",
-      "source": "CNA/AP; CAAP",
-      "tag": "CONFIRMED",
-      "motif": "plane"
-    },
-    {
-      "n": 25,
-      "region": "South Asia",
-      "place": "MANIPUR",
-      "topic": "HEALTH",
-      "headline": "Toxic liquor kills 11",
-      "detail": "180+ hospitalised; Deccan says 300.",
-      "source": "Al Jazeera; Deccan",
-      "tag": "OFFICIAL",
-      "motif": "liquor"
-    },
-    {
-      "n": 26,
-      "region": "South Asia",
-      "place": "SAVAR",
-      "topic": "LABOUR",
-      "headline": "Garment unrest in Savar",
-      "detail": "50–80 factories shut amid clashes.",
-      "source": "Daily Star; TBS",
-      "tag": "REPORTED",
-      "motif": "factory"
-    },
-    {
-      "n": 14,
-      "region": "Oceania",
-      "place": "WELLINGTON",
-      "topic": "CRICKET",
-      "headline": "India 486-4, lead 118",
-      "detail": "Rahul 136, a 13th Test ton; Gill out 98.",
-      "source": "AFP; Dawn",
-      "tag": "CONFIRMED",
-      "motif": "cricket"
-    },
-    {
-      "n": 46,
-      "region": "Global",
-      "place": "MERCURY",
-      "topic": "SPACE",
-      "headline": "BepiColombo at Mercury",
-      "detail": "37-min burn from 18:24. Joined until Dec.",
-      "source": "Eos; ESA",
-      "tag": "REPORTED",
-      "motif": "mercury"
-    },
-    {
-      "n": 49,
-      "region": "Europe",
-      "place": "TWICKENHAM",
-      "topic": "RUGBY",
-      "headline": "England 37-12 All Blacks",
-      "detail": "Record Nations Championship win.",
-      "source": "Reuters; BBC",
-      "tag": "CONFIRMED",
-      "motif": "rugby"
-    },
-    {
-      "n": 34,
-      "region": "Americas",
-      "place": "LAS VEGAS",
-      "topic": "F1",
-      "headline": "Verstappen on pole",
-      "detail": "Antonelli −5; Russell 2, Norris 3. Race not run.",
-      "source": "formula1.com; ESPN",
-      "tag": "CONFIRMED",
-      "motif": "grid"
-    }
+  "leadOrder": [1, 2, 3, 4],
+  "midOrder": [5, 8, 7, 13, 25, 26, 14, 46, 49, 34],
+  "briefColumns": [
+    ["EUR", "MEA", "AFR"],
+    ["EAS"],
+    ["SAS", "OCE", "AME", "GLB"]
   ],
-  "briefs": [
-    { "n": 6, "region": "Europe", "line": "Podil: 2 houses hit, 1 hurt.", "source": "KMVA", "tag": "OFFICIAL" },
-    { "n": 9, "region": "Europe", "line": "Act VI marches; ~70,000 police.", "source": "AFP", "tag": "REPORTED" },
-    { "n": 47, "region": "Europe", "line": "Alcaraz d. Shelton 3-6 6-3 7-6(1).", "source": "ATP", "tag": "CONFIRMED" },
-    { "n": 48, "region": "Europe", "line": "City 1-1 (Haaland out); Newcastle 2-2; Chelsea 1-4.", "source": "BBC", "tag": "CONFIRMED" },
-    { "n": 10, "region": "Middle East", "line": "Gaza media: 3 killed in a city strike.", "source": "National", "tag": "REPORTED" },
-    { "n": 11, "region": "Middle East", "line": "IRGC claims MQ-9 down over Hormuz (“58th”).", "source": "IRNA", "tag": "CLAIM" },
-    { "n": 12, "region": "Middle East", "line": "Hormuz: 6 crossings, ~9% of normal.", "source": "hormuz.now", "tag": "REPORTED" },
-    { "n": 29, "region": "Africa", "line": "Court bid against the IEBC CEO pick.", "source": "Standard", "tag": "REPORTED" },
-    { "n": 30, "region": "Africa", "line": "Obi vows to end kidnappings and graft.", "source": "Punch", "tag": "REPORTED" },
-    { "n": 31, "region": "Africa", "line": "Nearly 600 women killed in three months.", "source": "PT", "tag": "REPORTED" },
-    { "n": 32, "region": "Africa", "line": "Ngwempisi foam prompts a pollution probe.", "source": "Times", "tag": "REPORTED" },
-    { "n": 33, "region": "Africa", "line": "African Group: “we came to claim what is rightfully ours.”", "source": "BBC", "tag": "CONFIRMED" },
-    { "n": 27, "region": "South Asia", "line": "PCB list of 38 omits Rizwan, Masood, Ayub.", "source": "Dawn", "tag": "CONFIRMED" },
-    { "n": 28, "region": "South Asia", "line": "Climate minister calls climate the “enemy”.", "source": "Dawn", "tag": "REPORTED" },
-    { "n": 16, "region": "East Asia", "line": "Urabandai: 1,000+ cut off by snow.", "source": "Kyodo", "tag": "OFFICIAL" },
-    { "n": 17, "region": "East Asia", "line": "BTS win five MAMA awards; Cortis take SOTY.", "source": "Yonhap", "tag": "CONFIRMED" },
-    { "n": 18, "region": "East Asia", "line": "Five freight cars derail near Sejong.", "source": "Yonhap", "tag": "OFFICIAL" },
-    { "n": 19, "region": "East Asia", "line": "Lee at an Ulsan AI site; CSAT-tip reward.", "source": "Yonhap", "tag": "OFFICIAL" },
-    { "n": 20, "region": "East Asia", "line": "Bus hits pavement near Hongik; six hurt.", "source": "Yonhap", "tag": "CONFIRMED" },
-    { "n": 21, "region": "East Asia", "line": "Onosato and Wakamotoharu tied 12-2.", "source": "Kyodo", "tag": "CONFIRMED" },
-    { "n": 22, "region": "East Asia", "line": "Princess Aiko returns from Singapore.", "source": "Kyodo", "tag": "OFFICIAL" },
-    { "n": 23, "region": "East Asia", "line": "Choi Min-jeong: third straight 1,000m.", "source": "Yonhap", "tag": "CONFIRMED" },
-    { "n": 24, "region": "East Asia", "line": "Essay and interview exams, 21–22 Nov.", "source": "Aju", "tag": "OFFICIAL" },
-    { "n": 43, "region": "East Asia", "line": "Ministry weighs ISP blocks after GMO breach.", "source": "Asahi", "tag": "REPORTED" },
-    { "n": 44, "region": "East Asia", "line": "Tashima stays in the FIFA presidential race.", "source": "Asahi", "tag": "REPORTED" },
-    { "n": 45, "region": "East Asia", "line": "Tochigi: train hits a car; 300 unhurt.", "source": "Kyodo", "tag": "OFFICIAL" },
-    { "n": 15, "region": "Oceania", "line": "Cricket Australia backs Cummins as captain.", "source": "ABC", "tag": "CONFIRMED" },
-    { "n": 39, "region": "Oceania", "line": "Rallies warn on homebirth access and cover.", "source": "ABC", "tag": "REPORTED" },
-    { "n": 40, "region": "Oceania", "line": "Schoolies begin on the Gold Coast; fewer.", "source": "ABC", "tag": "REPORTED" },
-    { "n": 41, "region": "Oceania", "line": "Four struck by lightning at Tocumwal.", "source": "ABC", "tag": "REPORTED" },
-    { "n": 42, "region": "Oceania", "line": "Sydney: two teens stabbed; a 17-year-old charged.", "source": "ABC", "tag": "OFFICIAL" },
-    { "n": 35, "region": "Americas", "line": "St. Johns at 18.76 ft; Rockledge to be ready.", "source": "NWS", "tag": "OFFICIAL" },
-    { "n": 36, "region": "Americas", "line": "Spaniards abroad start voting for 29 Nov.", "source": "EFE", "tag": "OFFICIAL" },
-    { "n": 38, "region": "Americas", "line": "Astronomers report a nearby triple star.", "source": "CBC", "tag": "REPORTED" },
-    { "n": 37, "region": "Global", "line": "Bitcoin ~$58,460, down about 5% in 24h.", "source": "MyTrade", "tag": "REPORTED" }
+  "mapNotes": [
+    "Off the map: 37 bitcoin · 38 triple star (no site named) · 46 BepiColombo at Mercury",
+    "* Saturday local time (still Friday UTC): Riyadh alert, Davao landing, Tochigi train",
+    "HOW SURE: OFFICIAL on the record · CONFIRMED wires agree · REPORTED one outlet or figures differ · CLAIM one side only"
   ],
   "dateCheck": {
     "title": "DATE CHECK",
-    "lead": "Left out on purpose. These are Thursday 19 or Friday 20 November, not Saturday’s news:",
+    "intro": "Left out on purpose. These are Thursday 19 or Friday 20 November, not Saturday's news:",
     "items": [
-      "Phumzile Mlambo-Ngcuka dies (20 Nov)",
-      "S&P 500 and Dow in correction (Fri)",
-      "Kryvyi Rih strike, 2 killed including a child (Fri)",
+      "Phumzile Mlambo-Ngcuka, South Africa's first female deputy president, dies (20 Nov)",
+      "S&P 500 and Dow in correction (Fri 20 Nov)",
+      "Kryvyi Rih ballistic strike: 2 killed, including a 7-year-old, about 60 hurt (Fri)",
       "Equinor says the cyberattack has stopped (20 Nov)",
       "Haiti–El Salvador prisons deal (20 Nov)",
-      "Depardieu/Houellebecq probe (19–20 Nov)",
-      "Morocco’s €366m defence plan (18–20 Nov)",
-      "A judge blocks Trump’s DC arch; Connecticut ICE-mask ruling; Jurf al-Nasr deal (Fri)",
-      "European student protests, including Berlin “GenZ regelt” (Fri)",
-      "Japan closes EV subsidy applications (Fri night)",
-      "EU Council authorises the Indonesia FTA signing (18 Nov)",
-      "Long March-8A launch (20 Nov)",
-      "Russian objects in Polish airspace (Fri)",
-      "Friday Jazan intercepts and Hodeidah strikes",
-      "Kyiv and Dnipro bridge strikes and Friday’s wider barrage",
-      "Italy’s general strike (Fri)",
+      "Depardieu/Houellebecq gang-rape probe (19–20 Nov)",
+      "Morocco's €366m defence-industry plan (18–20 Nov)",
+      "A second judge blocks Trump's DC memorial arch; Connecticut ICE-mask ruling; Iraq Jurf al-Nasr deal (Fri 20 Nov)",
+      "European student and youth protests, including Berlin \"GenZ regelt\" (Fri 20 Nov)",
+      "Japan closes EV subsidy applications early (Fri night)",
+      "EU Council authorises signing of the Indonesia FTA (18 Nov)",
+      "Long March-8A internet-satellite launch (20 Nov)",
+      "Friday Russian objects in Polish airspace; Friday Jazan intercepts and Hodeidah strikes",
+      "Kyiv Dnipro bridges and Friday's wider barrage",
+      "Italy strike",
       "UK–EU food and youth deal (Fri)",
-      "COP31’s Friday deadlock, separate from Saturday overtime",
-      "Cyclone Akvan’s India landfall (Fri)",
-      "Anthropic IPO first trade and Friday’s Asian close",
-      "Palisades Fire verdict (Fri)",
-      "Reinaldo Dennes execution in Texas (19 Nov)",
-      "Trump–Xi–Putin meeting in Shenzhen (19 Nov)",
+      "COP31 Friday close, separate from Saturday overtime",
+      "Akvan landfall (Fri)",
+      "Anthropic IPO first trade and Friday's Asia close",
+      "Palisades verdict (Fri)",
+      "Dennes execution (19 Nov)",
+      "Trump–Xi–Putin meeting (19 Nov)",
       "ICJ Myanmar ruling",
-      "GTA VI’s launch",
+      "GTA VI launch",
       "Voyager 1 at one light-day (18 Nov)",
-      "Denmark expels a Russian diplomat (Fri)",
-      "French court sentences in the Michel Zecler case (Fri)",
-      "Australia–China AI-talks agreement (Fri)",
-      "Trump’s “tremendous tax” remarks (Fri)"
+      "Denmark diplomat expulsion (Fri)",
+      "France Zecler sentences (Fri)",
+      "Australia–China AI talks agreement (Fri)",
+      "Trump \"tremendous tax\" remarks on overseas data centres (Fri)"
     ],
     "notYet": "Not yet: final COP31 text, Las Vegas GP race, ATP Finals final."
   },
-  "footer": "Every story happened or was first reported on Saturday 21 Nov 2026 in some time zone · claims attributed · original drawings · sources: AFP, Reuters, AP, BBC, Al Jazeera, Kyodo, Yonhap, ABC, Dawn and others",
-  "mapNote": "Off map: 46 BepiColombo (Mercury), 37 bitcoin."
+  "footer": "Every story happened or was first reported on Saturday 21 November 2026 in some time zone · claims attributed · original drawings · sources include AFP, Reuters, AP, BBC, Al Jazeera, Kyodo, Yonhap, ABC, Dawn, IGP, Indeci, ESA",
+  "stories": [
+    {
+      "id": 1,
+      "role": "lead",
+      "region": "EUR",
+      "kicker": "ANTALYA · CLIMATE",
+      "headline": "COP31 runs into Saturday overtime",
+      "deck": "No cover decision adopted. Third draft due Saturday. Kurum: \"We are close to the finish line, but we are not there yet.\"",
+      "source": "AFP 21 Nov; BBC; AP",
+      "tag": "CONFIRMED",
+      "pins": [{"lon": 30.7, "lat": 36.89}]
+    },
+    {
+      "id": 2,
+      "role": "lead",
+      "region": "MEA",
+      "kicker": "RIYADH · MILITARY",
+      "headline": "3 missiles downed over Riyadh*",
+      "deck": "Coalition says three Houthi missiles were shot down over Riyadh, then a drone in the south. Alert 01:53 local.",
+      "source": "Arab News; Reuters; Al Jazeera",
+      "tag": "OFFICIAL",
+      "pins": [{"lon": 46.72, "lat": 24.69}]
+    },
+    {
+      "id": 3,
+      "role": "lead",
+      "region": "AME",
+      "kicker": "JUNÍN · QUAKE",
+      "headline": "Peru M6.7, no deaths reported",
+      "deck": "00:09 UTC, 30 km NW of Junín, depth 129 km. Junín, Pasco, Huánuco and Lima damaged. One woman hurt in central Lima. No tsunami alert.",
+      "source": "IGP; Indeci",
+      "tag": "OFFICIAL",
+      "pins": [{"lon": -76.15, "lat": -10.97}]
+    },
+    {
+      "id": 4,
+      "role": "lead",
+      "region": "EUR",
+      "kicker": "WARSAW · NATO",
+      "headline": "Rutte: allies stand with Poland",
+      "deck": "\"All allies stand in full solidarity with Poland.\" Called dangerous and unacceptable. More air defence sought; no Article 4.",
+      "source": "TVP World; PAP",
+      "tag": "CONFIRMED",
+      "pins": [{"lon": 21.01, "lat": 52.23}]
+    },
+    {
+      "id": 5,
+      "role": "mid",
+      "region": "EUR",
+      "kicker": "UKRAINE · WAR",
+      "headline": "148 drones and 3 missiles",
+      "deck": "117 drones downed overnight; hits at 19 places.",
+      "source": "RBC-Ukraine; Kyiv Independent",
+      "tag": "OFFICIAL",
+      "pins": [{"lon": 30.52, "lat": 50.45}]
+    },
+    {
+      "id": 6,
+      "role": "brief",
+      "region": "EUR",
+      "line": "Podil: missile hit, two houses burned, one person hurt.",
+      "source": "KMVA",
+      "tag": "OFF",
+      "pins": [{"lon": 30.51, "lat": 50.47}]
+    },
+    {
+      "id": 7,
+      "role": "mid",
+      "region": "EUR",
+      "kicker": "GENEVA · ARMS",
+      "headline": "Killer-robot talks fail",
+      "deck": "No binding mandate. US and Russia resisted. Rules by 2028.",
+      "source": "Reuters; Al Jazeera",
+      "tag": "CONFIRMED",
+      "pins": [{"lon": 6.14, "lat": 46.2}]
+    },
+    {
+      "id": 8,
+      "role": "mid",
+      "region": "EUR",
+      "kicker": "EU · BUDGET",
+      "headline": "Costa's €1.78tn EU budget",
+      "deck": "10% under the plan. Cohesion cut; 3% levy. Élysée: \"very disappointing\".",
+      "source": "Euronews; dpa",
+      "tag": "OFFICIAL",
+      "pins": [{"lon": 4.35, "lat": 50.85}]
+    },
+    {
+      "id": 9,
+      "role": "brief",
+      "region": "EUR",
+      "line": "France Act VI marches; about 70,000 police. Turnout falling.",
+      "source": "France 24/AFP",
+      "tag": "REP",
+      "pins": [{"lon": 2.35, "lat": 48.86}]
+    },
+    {
+      "id": 10,
+      "role": "brief",
+      "region": "MEA",
+      "line": "Gaza: Palestinian media say 3 killed in a city strike.",
+      "source": "The National",
+      "tag": "REP",
+      "pins": [{"lon": 34.47, "lat": 31.5}]
+    },
+    {
+      "id": 11,
+      "role": "brief",
+      "region": "MEA",
+      "line": "IRGC claims it downed a US MQ-9 over Hormuz (\"58th\").",
+      "source": "Al Jazeera; IRNA",
+      "tag": "CLAIM",
+      "pins": [{"lon": 56.45, "lat": 26.6}]
+    },
+    {
+      "id": 12,
+      "role": "brief",
+      "region": "MEA",
+      "line": "Hormuz: 6 AIS-visible crossings, about 9% of normal.",
+      "source": "hormuz.now",
+      "tag": "REP",
+      "pins": [{"lon": 56.9, "lat": 26.25}]
+    },
+    {
+      "id": 13,
+      "role": "mid",
+      "region": "EAS",
+      "kicker": "DAVAO · AVIATION",
+      "headline": "PX19: all 146 safe",
+      "deck": "PNG COP31 team aboard. Davao slide; all 146 unhurt.",
+      "source": "CNA/AP; CAAP",
+      "tag": "CONFIRMED",
+      "pins": [{"lon": 125.61, "lat": 7.07}]
+    },
+    {
+      "id": 14,
+      "role": "mid",
+      "region": "OCE",
+      "kicker": "WELLINGTON · CRICKET",
+      "headline": "India 486-4, lead 118",
+      "deck": "KL Rahul 136, a 13th Test ton. Gill out for 98. Day 3 stumps.",
+      "source": "AFP; Dawn",
+      "tag": "CONFIRMED",
+      "pins": [{"lon": 174.78, "lat": -41.29}]
+    },
+    {
+      "id": 15,
+      "role": "brief",
+      "region": "OCE",
+      "line": "Cricket Australia unanimously backs Pat Cummins as captain.",
+      "source": "ABC",
+      "tag": "CONF",
+      "pins": [{"lon": 149.13, "lat": -35.28}]
+    },
+    {
+      "id": 16,
+      "role": "brief",
+      "region": "EAS",
+      "line": "Urabandai: over 1,000 cut off by snow and fallen trees.",
+      "source": "Kyodo",
+      "tag": "OFF",
+      "pins": [{"lon": 140.07, "lat": 37.65}]
+    },
+    {
+      "id": 17,
+      "role": "brief",
+      "region": "EAS",
+      "line": "BTS win five MAMA awards in Osaka; Cortis take song of the year.",
+      "source": "Yonhap",
+      "tag": "CONF",
+      "pins": [{"lon": 135.5, "lat": 34.69}]
+    },
+    {
+      "id": 18,
+      "role": "brief",
+      "region": "EAS",
+      "line": "Sejong: five freight cars derail; Saemaeul and Mugunghwa stop.",
+      "source": "Yonhap",
+      "tag": "OFF",
+      "pins": [{"lon": 127.29, "lat": 36.48}]
+    },
+    {
+      "id": 19,
+      "role": "brief",
+      "region": "EAS",
+      "line": "Lee at an Ulsan AI site; repeats the won 100m CSAT reward.",
+      "source": "Yonhap",
+      "tag": "OFF",
+      "pins": [{"lon": 129.31, "lat": 35.54}]
+    },
+    {
+      "id": 20,
+      "role": "brief",
+      "region": "EAS",
+      "line": "Seoul: a bus hits the pavement at Hongik; six hurt.",
+      "source": "Yonhap",
+      "tag": "CONF",
+      "pins": [{"lon": 126.92, "lat": 37.55}]
+    },
+    {
+      "id": 21,
+      "role": "brief",
+      "region": "EAS",
+      "line": "Kyushu basho: Onosato and Wakamotoharu tied at 12-2.",
+      "source": "Kyodo",
+      "tag": "CONF",
+      "pins": [{"lon": 130.4, "lat": 33.59}]
+    },
+    {
+      "id": 22,
+      "role": "brief",
+      "region": "EAS",
+      "line": "Princess Aiko returns home from her Singapore visit.",
+      "source": "IHA",
+      "tag": "OFF",
+      "pins": [{"lon": 139.75, "lat": 35.68}]
+    },
+    {
+      "id": 23,
+      "role": "brief",
+      "region": "EAS",
+      "line": "Choi Min-jeong wins a third straight 1,000m title, in Seoul.",
+      "source": "Yonhap",
+      "tag": "CONF",
+      "pins": [{"lon": 126.98, "lat": 37.57}]
+    },
+    {
+      "id": 24,
+      "role": "brief",
+      "region": "EAS",
+      "line": "South Korea: university essay and interview exams begin.",
+      "source": "Aju Press",
+      "tag": "OFF",
+      "pins": [{"lon": 126.99, "lat": 37.53}]
+    },
+    {
+      "id": 25,
+      "role": "mid",
+      "region": "SAS",
+      "kicker": "MANIPUR · HEALTH",
+      "headline": "Toxic liquor kills 11",
+      "deck": "180+ hospitalised in Chandel; probe ordered. Deccan says 300.",
+      "source": "Al Jazeera; Deccan",
+      "tag": "OFFICIAL",
+      "pins": [{"lon": 93.98, "lat": 24.32}]
+    },
+    {
+      "id": 26,
+      "role": "mid",
+      "region": "SAS",
+      "kicker": "SAVAR · LABOUR",
+      "headline": "Garment unrest shuts mills",
+      "deck": "50–80 factories on holiday. Clashes in Ashulia.",
+      "source": "Daily Star; TBS",
+      "tag": "REPORTED",
+      "pins": [{"lon": 90.26, "lat": 23.86}]
+    },
+    {
+      "id": 27,
+      "role": "brief",
+      "region": "SAS",
+      "line": "PCB contracts for 38 omit Rizwan, Shan Masood and Saim Ayub.",
+      "source": "Dawn",
+      "tag": "CONF",
+      "pins": [{"lon": 73.05, "lat": 33.69}]
+    },
+    {
+      "id": 28,
+      "role": "brief",
+      "region": "SAS",
+      "line": "SCO forum in India: Pakistan calls climate the \"enemy\".",
+      "source": "Dawn",
+      "tag": "REP",
+      "pins": [{"lon": 77.21, "lat": 28.61}]
+    },
+    {
+      "id": 29,
+      "role": "brief",
+      "region": "AFR",
+      "line": "Kenya: a party seeks orders against the IEBC CEO pick.",
+      "source": "The Standard",
+      "tag": "REP",
+      "pins": [{"lon": 36.82, "lat": -1.29}]
+    },
+    {
+      "id": 30,
+      "role": "brief",
+      "region": "AFR",
+      "line": "Nigeria: Peter Obi vows to end kidnappings and corruption.",
+      "source": "Punch",
+      "tag": "REP",
+      "pins": [{"lon": 7.49, "lat": 9.06}]
+    },
+    {
+      "id": 31,
+      "role": "brief",
+      "region": "AFR",
+      "line": "Premium Times: nearly 600 women killed in three months.",
+      "source": "Premium Times",
+      "tag": "REP",
+      "pins": [{"lon": 28.19, "lat": -25.75}]
+    },
+    {
+      "id": 32,
+      "role": "brief",
+      "region": "AFR",
+      "line": "Eswatini: foam on the Ngwempisi prompts a pollution probe.",
+      "source": "Times of Eswatini",
+      "tag": "REP",
+      "pins": [{"lon": 31.35, "lat": -26.52}]
+    },
+    {
+      "id": 33,
+      "role": "brief",
+      "region": "AFR",
+      "line": "African Group: \"we came to claim what is rightfully ours\"; $120bn.",
+      "source": "BBC",
+      "tag": "CONF",
+      "pins": [{"lon": 30.78, "lat": 36.84}]
+    },
+    {
+      "id": 34,
+      "role": "mid",
+      "region": "AME",
+      "kicker": "LAS VEGAS · F1",
+      "headline": "Verstappen on pole",
+      "deck": "Antonelli 1:33.893, 5-place penalty. Russell 2, Norris 3. Race not run.",
+      "source": "formula1.com; ESPN",
+      "tag": "CONFIRMED",
+      "pins": [{"lon": -115.17, "lat": 36.17}]
+    },
+    {
+      "id": 35,
+      "role": "brief",
+      "region": "AME",
+      "line": "St. Johns near Cocoa at 18.76 ft; Rockledge told to be ready.",
+      "source": "NWS",
+      "tag": "OFF",
+      "pins": [{"lon": -80.74, "lat": 28.39}]
+    },
+    {
+      "id": 36,
+      "role": "brief",
+      "region": "AME",
+      "line": "Spaniards abroad begin voting for the 29 Nov election.",
+      "source": "EFE",
+      "tag": "OFF",
+      "pins": [{"lon": -58.38, "lat": -34.6}]
+    },
+    {
+      "id": 37,
+      "role": "brief",
+      "region": "GLB",
+      "line": "Bitcoin about $58,460, down about 5% in 24 hours (12:30 UTC).",
+      "source": "MyTrade",
+      "tag": "REP",
+      "pins": []
+    },
+    {
+      "id": 38,
+      "role": "brief",
+      "region": "AME",
+      "line": "Astronomers find a nearby \"weirdo\" triple-star system.",
+      "source": "CBC",
+      "tag": "REP",
+      "pins": []
+    },
+    {
+      "id": 39,
+      "role": "brief",
+      "region": "OCE",
+      "line": "Australia: dozens of rallies on midwife homebirth rules.",
+      "source": "ABC",
+      "tag": "REP",
+      "pins": [{"lon": 149.13, "lat": -35.31}]
+    },
+    {
+      "id": 40,
+      "role": "brief",
+      "region": "OCE",
+      "line": "Gold Coast Schoolies week begins, with numbers down.",
+      "source": "ABC",
+      "tag": "REP",
+      "pins": [{"lon": 153.43, "lat": -28.02}]
+    },
+    {
+      "id": 41,
+      "role": "brief",
+      "region": "OCE",
+      "line": "Tocumwal: four people struck by lightning at a festival.",
+      "source": "ABC",
+      "tag": "REP",
+      "pins": [{"lon": 145.57, "lat": -35.81}]
+    },
+    {
+      "id": 42,
+      "role": "brief",
+      "region": "OCE",
+      "line": "Sydney: two teens stabbed; a 17-year-old is charged.",
+      "source": "ABC",
+      "tag": "OFF",
+      "pins": [{"lon": 151.21, "lat": -33.87}]
+    },
+    {
+      "id": 43,
+      "role": "brief",
+      "region": "EAS",
+      "line": "Japan's ministry weighs ISP blocking after the GMO breach.",
+      "source": "Asahi",
+      "tag": "REP",
+      "pins": [{"lon": 139.75, "lat": 35.68}]
+    },
+    {
+      "id": 44,
+      "role": "brief",
+      "region": "EAS",
+      "line": "Kunio Tashima stays in the FIFA presidential race.",
+      "source": "Asahi",
+      "tag": "REP",
+      "pins": [{"lon": 139.72, "lat": 35.66}]
+    },
+    {
+      "id": 45,
+      "role": "brief",
+      "region": "EAS",
+      "line": "Tochigi: express train hits a car; all 300 unhurt.*",
+      "source": "Kyodo",
+      "tag": "OFF",
+      "pins": [{"lon": 139.88, "lat": 36.57}]
+    },
+    {
+      "id": 46,
+      "role": "mid",
+      "region": "GLB",
+      "kicker": "MERCURY · SPACE",
+      "headline": "BepiColombo at Mercury",
+      "deck": "37-min burn from 18:24 UTC. MPO and Mio joined until 9–10 Dec.",
+      "source": "Eos; ESA",
+      "tag": "REPORTED",
+      "pins": []
+    },
+    {
+      "id": 47,
+      "role": "brief",
+      "region": "EUR",
+      "line": "Alcaraz beats Shelton 3-6 6-3 7-6(1); into Sunday's final.",
+      "source": "ATP; AFP",
+      "tag": "CONF",
+      "pins": [{"lon": 7.69, "lat": 45.07}]
+    },
+    {
+      "id": 48,
+      "role": "brief",
+      "region": "EUR",
+      "line": "City 1-1 Fulham (Haaland goal ruled out); Newcastle 2-2 Arsenal; Chelsea 1-4 Leeds.",
+      "source": "Reuters; BBC",
+      "tag": "CONF",
+      "pins": [
+        {"lon": -2.2, "lat": 53.48},
+        {"lon": -1.62, "lat": 54.98},
+        {"lon": -0.19, "lat": 51.48}
+      ]
+    },
+    {
+      "id": 49,
+      "role": "mid",
+      "region": "EUR",
+      "kicker": "TWICKENHAM · RUGBY",
+      "headline": "England 37-12 All Blacks",
+      "deck": "Record Nations Championship win over New Zealand.",
+      "source": "Reuters; BBC",
+      "tag": "CONFIRMED",
+      "pins": [{"lon": -0.34, "lat": 51.46}]
+    }
+  ]
 }
