@@ -1,10 +1,12 @@
-// Saturday 21 November 2026 — copy this folder's entry.png into the output dir.
+// Saturday 21 November 2026 — copy the broadsheet plate into the make.fun output folder.
 import { copyFile, mkdir } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const scriptDir = dirname(fileURLToPath(import.meta.url));
-const outputDir = process.env.MAKEFUN_OUTPUT_DIR ?? "/output";
+const here = dirname(fileURLToPath(import.meta.url));
+const destDir = process.env.MAKEFUN_OUTPUT_DIR ?? "/output";
+const sourcePng = join(here, "entry.png");
+const targetPng = join(destDir, "entry.png");
 
-await mkdir(outputDir, { recursive: true });
-await copyFile(join(scriptDir, "entry.png"), join(outputDir, "entry.png"));
+await mkdir(destDir, { recursive: true });
+await copyFile(sourcePng, targetPng);
