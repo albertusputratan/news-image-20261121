@@ -285,7 +285,7 @@ function midArt(story) {
     13: `<rect width="200" height="54" fill="#f6d5d1"/><text x="12" y="38" fill="#a32020" font-family="Playfair Display, serif" font-size="30" font-weight="700">146</text><path d="M124 34 h46 l-10-8 v-6 h-8 v6 l-8 4 z" fill="#a32020"/><path d="M150 34 v8" stroke="#a32020" stroke-width="1.5"/><circle cx="138" cy="43" r="2" fill="#a32020"/><circle cx="164" cy="43" r="2" fill="#a32020"/>`,
     25: `<rect width="200" height="54" fill="#f8dcc8"/><text x="14" y="40" fill="#c45a18" font-family="Playfair Display, serif" font-size="32" font-weight="700">11</text><rect x="132" y="16" width="22" height="26" rx="4" fill="none" stroke="#c45a18" stroke-width="1.8"/><rect x="138" y="10" width="10" height="8" fill="#c45a18"/><path d="M168 40 l10-22 10 22 z" fill="none" stroke="#9d2c2c" stroke-width="1.6"/>`,
     26: `<rect width="200" height="54" fill="#f3e1cf"/><path d="M16 40 l18-16 18 16 v8 h-36z M70 40 l18-16 18 16 v8 h-36z M124 40 l18-16 18 16 v8 h-36z" fill="#c45a18"/><rect x="150" y="18" width="36" height="8" fill="#9d2c2c"/>`,
-    14: `<rect width="200" height="54" fill="#d5efef"/><rect x="18" y="12" width="3" height="28" fill="#0e7480"/><rect x="28" y="12" width="3" height="28" fill="#0e7480"/><rect x="38" y="12" width="3" height="28" fill="#0e7480"/><rect x="16" y="38" width="28" height="3" fill="#0e7480"/><text x="62" y="38" fill="#0e7480" font-family="Playfair Display, serif" font-size="26" font-weight="700">486-4</text>`,
+    14: `<rect width="200" height="54" fill="#d5efef"/><text x="12" y="38" fill="#0e7480" font-family="Playfair Display, serif" font-size="26" font-weight="700">486-4</text><rect x="154" y="12" width="3" height="28" fill="#0e7480"/><rect x="164" y="12" width="3" height="28" fill="#0e7480"/><rect x="174" y="12" width="3" height="28" fill="#0e7480"/><rect x="152" y="38" width="28" height="3" fill="#0e7480"/>`,
     46: `<rect width="200" height="54" fill="#e6e2da"/><circle cx="46" cy="28" r="16" fill="#8d8478"/><circle cx="40" cy="24" r="5" fill="#6e675e"/><path d="M92 34 h28 l6-8 h10 v8 h8" fill="none" stroke="#5c564c" stroke-width="1.6"/><circle cx="148" cy="26" r="5" fill="none" stroke="#5c564c" stroke-width="1.4"/><path d="M70 18c30-16 70-8 96 6" fill="none" stroke="#a32020" stroke-width="1.2" stroke-dasharray="3 2"/>`,
     49: `<rect width="200" height="54" fill="#d9e4f2"/><text x="12" y="38" fill="#1e4e8c" font-family="Playfair Display, serif" font-size="28" font-weight="700">37–12</text><ellipse cx="156" cy="28" rx="16" ry="10" fill="none" stroke="#1e4e8c" stroke-width="1.8"/><path d="M150 28 h12 M156 23 v10" stroke="#1e4e8c" stroke-width="1.2"/>`,
     34: `<rect width="200" height="54" fill="#d9dcf0"/><text x="12" y="24" fill="#2c3e86" font-family="Inter, sans-serif" font-size="11" font-weight="700" letter-spacing="1">POLE</text><text x="12" y="44" fill="#2c3e86" font-family="Playfair Display, serif" font-size="18" font-weight="700">1 VER</text>${Array.from({ length: 8 }, (_, i) => `<rect x="${128 + i * 8}" y="40" width="8" height="8" fill="${i % 2 ? "#f7f1e6" : "#221e18"}"/>`).join("")}`,
@@ -376,7 +376,10 @@ function regionBar() {
 
 function kpiRow() {
   return news.kpis
-    .map((chip) => `<div class="chip"><span>${esc(chip.label)}</span><b>${esc(chip.value)}</b></div>`)
+    .map((chip) => {
+      const side = /\d/.test(chip.value) ? "stat" : "text";
+      return `<div class="chip ${side}"><span>${esc(chip.label)}</span><b>${esc(chip.value)}</b></div>`;
+    })
     .join("");
 }
 
@@ -426,10 +429,12 @@ const html = `<!DOCTYPE html>
   .chip {
     flex: 1; min-width: 0; height: 24px;
     border: 1px solid #221e18; background: #fbf8f2;
-    display: flex; align-items: center; justify-content: space-between;
+    display: flex; flex-direction: column; justify-content: center;
     padding: 0 6px; font-size: 8px; line-height: 1.3;
+    text-align: left;
   }
-  .chip b { font-family: "Playfair Display", "Source Serif Pro", serif; font-size: 12px; font-weight: 700; line-height: 1.15; letter-spacing: -0.01em; }
+  .chip.stat { text-align: right; }
+  .chip b { font-family: "Playfair Display", "Source Serif Pro", serif; font-size: 12px; font-weight: 700; line-height: 1.15; letter-spacing: -0.01em; margin-top: -2px; }
   .utc { top: 128px; height: 48px; }
   .utc .axis { position: absolute; left: 0; right: 0; top: 24px; height: 1px; background: #221e18; }
   .utc i { position: absolute; top: 19px; width: 1px; height: 11px; background: #221e18; }
@@ -437,7 +442,7 @@ const html = `<!DOCTYPE html>
   .tick.up { top: 5px; }
   .tick.down { top: 26px; }
   .regions { top: 176px; height: 22px; display: flex; }
-  .seg { min-width: 0; color: #fff; display: flex; align-items: center; justify-content: space-between; padding: 0 4px; font-size: 7.5px; font-weight: 700; line-height: 1.25; letter-spacing: 0; }
+  .seg { min-width: 0; color: #fff; display: flex; flex-wrap: wrap; align-items: center; align-content: center; justify-content: flex-start; column-gap: 3px; padding: 0 4px; font-size: 7.5px; font-weight: 700; line-height: 1.25; letter-spacing: 0; }
   .leads { top: 198px; height: 180px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
   .mids { top: 378px; height: 256px; display: grid; grid-template-columns: repeat(5, 1fr); grid-template-rows: 126px 126px; gap: 4px 6px; }
   .lead, .mid { border: 1px solid #221e18; background: #fbf8f2; display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
